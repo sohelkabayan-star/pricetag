@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" id="dynamicAppleIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230891b2'/%3E%3Cpath d='M30 35 L50 20 L70 35 L70 65 L50 80 L30 65 Z' fill='none' stroke='white' stroke-width='6' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='50' r='10' fill='white'/%3E%3C/svg%3E">
 
   <!-- Web App Manifest (Embedded Data-URI for Instant Android / PWA / APK Conversion) -->
-  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22TAG-OPS%20Enterprise%20Inventory%22%2C%22short_name%22%3A%22TAG-OPS%22%2C%22description%22%3A%22Optical%20Parsing%2C%20Auto-Translation%20%26%20Inventory%20Approval%20Matrix%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%230d1527%22%2C%22theme_color%22%3A%22%230d1527%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%253E%253Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%25230891b2'%2F%253E%253Cpath%20d%3D'M30%2035%20L50%2020%20L70%2035%20L70%2065%20L50%2080%20L30%2065%20Z'%20fill%3D'none'%20stroke%3D'white'%20stroke-width%3D'6'%20stroke-linejoin%3D'round'%2F%253E%253Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'10'%20fill%3D'white'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22TAG-OPS%20Enterprise%20Inventory%22%2C%22short_name%22%3A%22TAG-OPS%22%2C%22description%22%3A%22Optical%20Parsing%2C%20Auto-Translation%20%26%20Inventory%20Approval%20Matrix%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%230d1527%22%2C%22theme_color%22%3A%22%230d1527%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%253E%253Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%25230891b2'%2F%253E%253Cpath%20d%3D'M30%2035%20L50%2020%20L70%2035%20L70%2065%20L50%2080%20L30%2065%20Z' fill%3D'none' stroke%3D'white' stroke-width%3D'6' stroke-linejoin%3D'round'%2F%253E%253Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'10' fill%3D'white'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
   <!-- Tailwind CSS v4 Browser Engine -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -469,7 +469,7 @@
           <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1.5 text-center">Enter your PIN</label>
           <div class="relative flex items-center">
             <!-- inputmode="none" and readonly prevents mobile virtual keyboard from popping up on mobile -->
-            <input type="password" id="unifiedPinInput" inputmode="none" readonly required autocomplete="off" placeholder="••••" maxlength="8" onclick="openBottomSheetKeypad('unifiedPinInput', 'loginPinForm')" class="pin-display-input w-full bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-center text-xl tracking-[0.4em] font-mono text-cyan-600 dark:text-cyan-400 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition">
+            <input type="password" id="unifiedPinInput" inputmode="none" readonly required autocomplete="off" placeholder="••••" maxlength="8" onclick="openBottomSheetKeypad('unifiedPinInput', 'loginPinForm')" class="pin-display-input w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-center text-xl tracking-[0.4em] font-mono text-cyan-600 dark:text-cyan-400 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition">
             <button type="button" onclick="toggleFieldPasswordVisibility('unifiedPinInput', this)" class="absolute right-3 text-slate-400 hover:text-cyan-400 text-sm focus:outline-none p-1">
               <i class="fa-solid fa-eye"></i>
             </button>
@@ -769,7 +769,7 @@
               </button>
             </div>
 
-            <div id="deckOpticalAcquisitionWorkspace" class="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-lg bg-white/70 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80">
+            <div id="deckOpticalAcquisitionWorkspace" class="flex flex-col sm:row items-center justify-between gap-3 p-3 rounded-lg bg-white/70 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80">
               <div class="flex items-center gap-3 w-full sm:w-auto">
                 <div id="deckAcquisitionThumbContainer" class="w-16 h-16 rounded-lg bg-slate-200 dark:bg-slate-900 border border-cyan-500/40 flex items-center justify-center overflow-hidden shrink-0">
                   <img id="deckAcquisitionThumbImg" src="" class="w-full h-full object-cover hidden" alt="Acquisition Preview">
@@ -1755,6 +1755,16 @@
       } catch (err) { console.error("Firebase Catalog Entry Delete Error:", err); }
     };
 
+    // Real-time catalog item override in Firebase
+    window.saveMasterCatalogItemOverrideToFirebase = async function(barcodeKey, itemData) {
+      try {
+        if (!barcodeKey) return;
+        await set(ref(db, `catalog_registry/custom_overrides/${barcodeKey}`), itemData);
+      } catch (err) {
+        console.warn("Firebase Catalog Item Override Sync Error:", err);
+      }
+    };
+
     onValue(ref(db, 'catalog_registry'), (snapshot) => {
       const data = snapshot.val() || {};
       if (window.handleFirebaseCatalogRegistryUpdate) {
@@ -1880,6 +1890,7 @@
       composerBannerBase64: '',
       masterCatalog: [],
       catalogFiles: [],
+      catalogOverrides: {},
       isCatalogMatched: false,
       adminPin: '1212',
       operatorsMap: {},
@@ -1920,6 +1931,192 @@
       "INCLUSIVE", "INCL", "EXCL", "TOTAL", "ITEM", "CODE", "DATE", "EXP", "PROD", "NET", 
       "WT", "SR", "RS", "USD", "EUR", "EAN", "BARCODE", "TAX", "SAVE", "WAS", "NOW", "ONLY"
     ]);
+
+    /* =========================================================================
+       SMART AUTO-CATEGORY KEYWORD RULE MATRIX
+       ========================================================================= */
+    const CATEGORY_KEYWORD_RULES = [
+      {
+        category: "CHILLED & DAIRIES",
+        keywords: [
+          "MILK", "LABAN", "YOGURT", "YOGHURT", "CHEESE", "BUTTER", "GHEE", "CREAM", 
+          "MARGARINE", "PANEER", "CURD", "ICE CREAM", "CHILLED", "DAIRY", "LABNEH", 
+          "MOZZARELLA", "CHEDDAR", "KRAFT", "DANONE", "ALMARAI", "NADA", "SAUDIA"
+        ]
+      },
+      {
+        category: "GROCERY",
+        keywords: [
+          "RICE", "OIL", "FLOUR", "ATTA", "MAIDA", "SUGAR", "SALT", "SPICE", "MASALA",
+          "DAL", "PULSE", "LENTIL", "NOODLES", "MAGGI", "PASTA", "MACARONI", "SPAGHETTI", 
+          "SAUCE", "KETCHUP", "MAYONNAISE", "VINEGAR", "SOUP", "CAN", "CANNED", "TUNA", 
+          "SARDINE", "BEANS", "CHICKPEAS", "CEREAL", "CORNFLAKES", "OATS", "WHEAT", 
+          "HONEY", "JAM", "OLIVE OIL", "SUNFLOWER OIL", "MUSTARD", "COCONUT OIL"
+        ]
+      },
+      {
+        category: "BEVERAGES",
+        keywords: [
+          "WATER", "MINERAL WATER", "JUICE", "DRINK", "SODA", "COLA", "PEPSI", "COCA",
+          "SPRITE", "FANTA", "7UP", "MIRINDA", "TEA", "CHAI", "COFFEE", "NESCAFE", 
+          "CAPPUCCINO", "SYRUP", "ENERGY DRINK", "RED BULL", "NECTAR", "TANG", "BEVERAGE",
+          "ESPRESSO", "MATCHA", "SQUASH", "ROSE WATER"
+        ]
+      },
+      {
+        category: "SNACKS & CONFECTIONERY",
+        keywords: [
+          "CHIPS", "POTATO CHIPS", "CRISPS", "LAYS", "PRINGLES", "DORITOS", "BISCUIT", 
+          "COOKIES", "CHOCOLATE", "CANDY", "WAFER", "NUTS", "ALMOND", "CASHEW", "PEANUT", 
+          "CRACKER", "POPCORN", "CAKE", "CROISSANT", "SWEET", "GUM", "CHEWING GUM", 
+          "TOFFEE", "LOLLY", "SNACK", "GUMMY"
+        ]
+      },
+      {
+        category: "HOUSEHOLD & CLEANING",
+        keywords: [
+          "SOAP", "TISSUE", "FACIAL TISSUE", "TOILET PAPER", "DETERGENT", "POWDER", "BLEACH", 
+          "CLOROX", "CLEANER", "SURF", "TIDE", "ARIEL", "WIPES", "ALUMINUM FOIL", "CLING FILM", 
+          "SPONGE", "SCOURING", "DISHWASH", "FAIRY", "PRIL", "FABRIC SOFTENER", "DOWNY", 
+          "COMFORT", "AIR FRESHENER", "INSECTICIDE", "MOP", "BROOM", "TRASH BAG", "GARBAGE BAG"
+        ]
+      },
+      {
+        category: "PERSONAL CARE & BEAUTY",
+        keywords: [
+          "SHAMPOO", "CONDITIONER", "LOTION", "TOOTHPASTE", "TOOTHBRUSH", "DEODORANT", 
+          "PERFUME", "BODY SPRAY", "FACE WASH", "SHAVING", "RAZOR", "SANITIZER", "COTTON", 
+          "PADS", "DIAPER", "PAMPERS", "BODY WASH", "SHOWER GEL", "HAIR OIL", "VASELINE", 
+          "CREAM", "BEAUTY", "SKINCARE", "LIP BALM"
+        ]
+      },
+      {
+        category: "FRESH PRODUCE",
+        keywords: [
+          "APPLE", "BANANA", "ORANGE", "POTATO", "ONION", "TOMATO", "CARROT", "GARLIC", 
+          "GINGER", "LEMON", "LIME", "VEGETABLE", "FRUIT", "MANGO", "GRAPES", "WATERMELON", 
+          "CUCUMBER", "CHILLI", "CORIANDER", "MINT", "CAPSICUM", "CABBAGE"
+        ]
+      },
+      {
+        category: "MEAT & POULTRY",
+        keywords: [
+          "MEAT", "BEEF", "CHICKEN", "MUTTON", "FISH", "SHRIMP", "PRAWN", "LAMB", 
+          "POULTRY", "SEAFOOD", "SAUSAGE", "NUGGETS", "BURGER PATTY", "FRANKS"
+        ]
+      },
+      {
+        category: "BAKERY",
+        keywords: [
+          "BREAD", "BUN", "TOAST", "BAGEL", "MUFFIN", "RUSK", "PASTRY", "PITA", 
+          "ROTI", "PARATHA", "BAKERY", "TORTILLA"
+        ]
+      },
+      {
+        category: "ELECTRONICS & APPLIANCES",
+        keywords: [
+          "BULB", "LED", "BATTERY", "CHARGER", "CABLE", "ADAPTER", "LIGHT", "PLUG", 
+          "WIRE", "FAN", "KETTLE", "IRON", "EXTENSION", "POWER STRIP", "HEADPHONE"
+        ]
+      }
+    ];
+
+    function detectCategoryFromKeywords(description) {
+      if (!description || typeof description !== 'string') return '';
+      const upper = description.toUpperCase();
+      
+      for (const rule of CATEGORY_KEYWORD_RULES) {
+        for (const kw of rule.keywords) {
+          const regex = new RegExp(`\\b${kw}\\b`, 'i');
+          if (regex.test(upper)) {
+            return rule.category;
+          }
+        }
+      }
+      return '';
+    }
+
+    /* =========================================================================
+       MASTER CATALOG OVERRIDE & REAL-TIME PERSISTENCE ENGINE
+       ========================================================================= */
+
+    function loadCatalogOverrides() {
+      try {
+        const stored = localStorage.getItem('TAGOPS_CATALOG_OVERRIDES');
+        if (stored) {
+          STATE.catalogOverrides = JSON.parse(stored) || {};
+        }
+      } catch (e) {
+        STATE.catalogOverrides = {};
+      }
+    }
+
+    function saveRuntimeCatalogOverride(barcode, itemUpdates) {
+      if (!barcode) return;
+      const cleanBarcode = String(barcode).trim();
+      if (!cleanBarcode) return;
+
+      if (!STATE.catalogOverrides) STATE.catalogOverrides = {};
+
+      const existingOverride = STATE.catalogOverrides[cleanBarcode] || {};
+      const updatedItem = {
+        ...existingOverride,
+        ...itemUpdates,
+        barcode: cleanBarcode,
+        updatedAt: Date.now()
+      };
+
+      STATE.catalogOverrides[cleanBarcode] = updatedItem;
+      try {
+        localStorage.setItem('TAGOPS_CATALOG_OVERRIDES', JSON.stringify(STATE.catalogOverrides));
+      } catch (e) {}
+
+      // Update runtime in-memory masterCatalog array immediately
+      const index = STATE.masterCatalog.findIndex(item => String(item.barcode || '').trim() === cleanBarcode);
+      if (index >= 0) {
+        STATE.masterCatalog[index] = {
+          ...STATE.masterCatalog[index],
+          ...updatedItem
+        };
+      } else {
+        STATE.masterCatalog.push(updatedItem);
+      }
+
+      // Sync override to Firebase Realtime Database
+      if (window.saveMasterCatalogItemOverrideToFirebase) {
+        window.saveMasterCatalogItemOverrideToFirebase(cleanBarcode, updatedItem);
+      }
+
+      updateMetrics();
+    }
+
+    /* Sync active form field edits into Master Catalog DB in real-time */
+    function syncActiveFormFieldsToCatalogDB() {
+      const barcodeInput = document.getElementById('barcodeInput');
+      const descInput = document.getElementById('inputDescription');
+      const regInput = document.getElementById('regularPrice');
+      const offerInput = document.getElementById('inputOfferPrice');
+      const arabicInput = document.getElementById('inputArabicDescription');
+      const catInput = document.getElementById('inputCategory');
+
+      if (!barcodeInput) return;
+      const barcode = barcodeInput.value.trim();
+      if (!barcode || barcode.length < 3) return;
+
+      const desc = descInput ? descInput.value.trim() : '';
+      const regVal = regInput && regInput.value !== '' ? parseFloat(regInput.value) || 0 : 0;
+      const offerVal = offerInput && offerInput.value !== '' ? parseFloat(offerInput.value) || 0 : 0;
+      const arabicDesc = arabicInput ? arabicInput.value.trim() : '';
+      const category = catInput ? catInput.value.trim() : '';
+
+      saveRuntimeCatalogOverride(barcode, {
+        description: desc,
+        regular_price: regVal,
+        offer_price: offerVal,
+        arabic_description: arabicDesc,
+        category: category
+      });
+    }
 
     /* =========================================================================
        DYNAMIC APP BRANDING & LOGO ENGINE
@@ -2269,6 +2466,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       initAppTheme();
+      loadCatalogOverrides();
       loadSystemConfigs();
       loadSavedStagingDraft();
       loadSavedOperatorHistory();
@@ -2278,6 +2476,7 @@
       setupDescriptionTranslationListener();
       setupPriceValidationListeners();
       setupBarcodeLookupListeners();
+      setupRealTimeFormPersistenceListeners();
       setupOperatorDirectoryDelegation();
       setupPhysicalKeyboardPinListener();
       updateDynamicTagNotes();
@@ -2328,6 +2527,24 @@
       });
     }
 
+    function setupRealTimeFormPersistenceListeners() {
+      const fields = [
+        'inputDescription', 
+        'regularPrice', 
+        'inputOfferPrice', 
+        'inputArabicDescription', 
+        'inputCategory'
+      ];
+
+      fields.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+          el.addEventListener('change', () => syncActiveFormFieldsToCatalogDB());
+          el.addEventListener('blur', () => syncActiveFormFieldsToCatalogDB());
+        }
+      });
+    }
+
     function saveStagingDraftLocally() {
       try {
         localStorage.setItem('TAGOPS_STAGING_DRAFT', JSON.stringify(STATE.operatorBatchQueue));
@@ -2347,37 +2564,67 @@
 
     function setupDescriptionTranslationListener() {
       const descInput = document.getElementById('inputDescription');
+      const arabicInput = document.getElementById('inputArabicDescription');
+      const catInput = document.getElementById('inputCategory');
       if (!descInput) return;
 
       descInput.addEventListener('input', (e) => {
-        const text = e.target.value.trim();
+        const text = e.target.value;
+        const trimmedText = text.trim();
+
         if (STATE.translationDebounceTimer) clearTimeout(STATE.translationDebounceTimer);
 
-        if (!text || text.length < 2) return;
+        // Requirement 3: If description is completely cleared/deleted, wipe Arabic immediately
+        if (!trimmedText) {
+          if (arabicInput) arabicInput.value = '';
+          syncActiveFormFieldsToCatalogDB();
+          return;
+        }
 
+        // Requirement 2: Smart Auto-Category keyword analysis fallback if Category is empty
+        if (catInput && (!catInput.value || !catInput.value.trim())) {
+          const autoCat = detectCategoryFromKeywords(trimmedText);
+          if (autoCat) {
+            catInput.value = autoCat;
+          }
+        }
+
+        // Requirement 3: Real-time 450ms Debounced English-to-Arabic Auto-Translation
         STATE.translationDebounceTimer = setTimeout(async () => {
-          const matchedCatalogItem = STATE.masterCatalog.find(item => String(item.description || '').trim().toLowerCase() === text.toLowerCase());
-          const arabicInput = document.getElementById('inputArabicDescription');
+          const currentBarcode = document.getElementById('barcodeInput')?.value.trim();
+          
+          // Check if existing override or catalog match already contains exact Arabic
+          const matchedCatalogItem = STATE.masterCatalog.find(item => 
+            (currentBarcode && String(item.barcode || '').trim() === currentBarcode) ||
+            String(item.description || '').trim().toLowerCase() === trimmedText.toLowerCase()
+          );
 
-          if (matchedCatalogItem && matchedCatalogItem.arabic_description) {
+          if (matchedCatalogItem && matchedCatalogItem.arabic_description && matchedCatalogItem.description.trim().toLowerCase() === trimmedText.toLowerCase()) {
             if (arabicInput) arabicInput.value = matchedCatalogItem.arabic_description;
+            syncActiveFormFieldsToCatalogDB();
             return;
           }
 
           try {
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(text)}`;
+            const cleanEnglish = stripArabicCharacters(trimmedText);
+            if (!cleanEnglish) {
+              if (arabicInput) arabicInput.value = '';
+              return;
+            }
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(cleanEnglish)}`;
             const res = await fetch(url);
             const data = await res.json();
             if (data && data[0] && data[0][0] && data[0][0][0]) {
               const translated = data[0][0][0].trim();
-              if (arabicInput && translated && !arabicInput.value.trim()) {
+              if (arabicInput) {
                 arabicInput.value = translated;
+                syncActiveFormFieldsToCatalogDB();
               }
             }
           } catch (err) {
             console.warn("Google Translate auto-fetch error:", err);
           }
-        }, 300);
+        }, 450);
       });
     }
 
@@ -2494,10 +2741,9 @@
       const arabicInput = document.getElementById('inputArabicDescription');
       if (!arabicInput) return;
 
-      const currentArabic = arabicInput.value.trim();
       const cleanEnglish = stripArabicCharacters(englishText || '').trim();
 
-      if (!currentArabic && cleanEnglish.length > 1) {
+      if (cleanEnglish.length > 1) {
         try {
           const endpoint = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(cleanEnglish)}`;
           const res = await fetch(endpoint);
@@ -2505,8 +2751,9 @@
 
           if (data && data[0] && data[0][0] && data[0][0][0]) {
             const translated = data[0][0][0].trim();
-            if (translated && !arabicInput.value.trim()) {
+            if (translated) {
               arabicInput.value = translated;
+              syncActiveFormFieldsToCatalogDB();
             }
           }
         } catch (err) {
@@ -2530,7 +2777,10 @@
             const translated = data[0][0][0].trim();
             if (!descInput.value.trim()) {
               const sanitized = sanitizeOcrProductDescription(translated);
-              if (sanitized) descInput.value = sanitized;
+              if (sanitized) {
+                descInput.value = sanitized;
+                syncActiveFormFieldsToCatalogDB();
+              }
             }
           }
         } catch (err) {
@@ -2642,11 +2892,23 @@
     window.handleFirebaseCatalogRegistryUpdate = function(registryData) {
       const filesObj = registryData.files || {};
       const linksObj = registryData.links || {};
+      const cloudOverrides = registryData.custom_overrides || {};
 
       const filesArr = Object.values(filesObj);
       const linksArr = Object.values(linksObj);
 
       STATE.catalogFiles = [...filesArr, ...linksArr];
+
+      // Merge Cloud Overrides into local catalogOverrides
+      if (cloudOverrides && Object.keys(cloudOverrides).length > 0) {
+        STATE.catalogOverrides = {
+          ...STATE.catalogOverrides,
+          ...cloudOverrides
+        };
+        try {
+          localStorage.setItem('TAGOPS_CATALOG_OVERRIDES', JSON.stringify(STATE.catalogOverrides));
+        } catch (e) {}
+      }
 
       rebuildMasterCatalogFromFiles();
       renderCatalogFilesTable();
@@ -3188,6 +3450,25 @@
       showNotification('Profile and PIN updated and saved to Cloud!', 'success');
     }
 
+    function saveAdminPinSettings(event) {
+      event.preventDefault();
+      STATE.adminPin = document.getElementById('inputAdminPin').value.trim();
+      STATE.operatorDownloadPin = document.getElementById('inputOperatorDownloadPin').value.trim();
+
+      localStorage.setItem('TAGOPS_ADMIN_PIN', STATE.adminPin);
+      localStorage.setItem('TAGOPS_OPERATOR_DOWNLOAD_PIN', STATE.operatorDownloadPin);
+
+      if (window.syncSecurityPinsToFirebase) {
+        window.syncSecurityPinsToFirebase({
+          adminPin: STATE.adminPin,
+          catalogPin: STATE.operatorDownloadPin
+        });
+      }
+
+      toggleModal('securitySettingsModal');
+      showNotification('Admin PIN & Security Settings Saved to Cloud!', 'success');
+    }
+
     function saveTelegramSettingsFirebase() {
       const token = document.getElementById('telegramBotTokenInput').value.trim();
       const chat = document.getElementById('telegramChatIdInput').value.trim();
@@ -3683,7 +3964,10 @@
 
       const cleanInputDigits = barcodeVal.replace(/\D/g, '');
 
-      const match = directExcelMatch || STATE.masterCatalog.find(item => {
+      // Check overrides first, then master catalog
+      const overrideMatch = STATE.catalogOverrides && STATE.catalogOverrides[barcodeVal] ? STATE.catalogOverrides[barcodeVal] : null;
+
+      const match = overrideMatch || directExcelMatch || STATE.masterCatalog.find(item => {
         const itemCodeStr = String(item.barcode).trim();
         const itemDigits = itemCodeStr.replace(/\D/g, '');
         return (barcodeVal && itemCodeStr === barcodeVal) || (cleanInputDigits.length >= 4 && itemDigits === cleanInputDigits);
@@ -3692,7 +3976,13 @@
       if (match) {
         STATE.isCatalogMatched = true;
         descInput.value = match.description || '';
-        if (match.category) catInput.value = match.category;
+        
+        // Requirement 2: Excel Category First; if empty, run Smart Keyword Detection
+        if (match.category && String(match.category).trim() !== '') {
+          catInput.value = match.category;
+        } else {
+          catInput.value = detectCategoryFromKeywords(match.description || '');
+        }
         
         if (match.arabic_description) {
           arabicDescInput.value = match.arabic_description;
@@ -3720,6 +4010,7 @@
 
           if (sanitizedDescription) {
             descInput.value = sanitizedDescription;
+            catInput.value = detectCategoryFromKeywords(sanitizedDescription);
             if (hasArabic) {
               arabicDescInput.value = tagOcrData.arabic_description;
             } else {
@@ -3730,9 +4021,13 @@
             arabicDescInput.value = tagOcrData.arabic_description;
             descInput.value = '';
             await autoTranslateArabicToEnglish(tagOcrData.arabic_description);
+            if (descInput.value) {
+              catInput.value = detectCategoryFromKeywords(descInput.value);
+            }
           } else {
             descInput.value = '';
             arabicDescInput.value = '';
+            catInput.value = '';
             setTimeout(() => {
               descInput.focus();
               descInput.select();
@@ -3746,6 +4041,7 @@
         } else {
           descInput.value = '';
           arabicDescInput.value = '';
+          catInput.value = '';
           setTimeout(() => {
             descInput.focus();
           }, 100);
@@ -3756,6 +4052,7 @@
       }
 
       checkPriceEquality();
+      syncActiveFormFieldsToCatalogDB();
     }
 
     async function runGeminiVisionAI(base64Image) {
@@ -3924,7 +4221,23 @@
       }
 
       const arabicVal = arabicInput.value.trim();
-      const categoryVal = document.getElementById('inputCategory').value.trim();
+      let categoryVal = document.getElementById('inputCategory').value.trim();
+
+      // Requirement 2: Smart auto-category fallback if category is empty
+      if (!categoryVal) {
+        categoryVal = detectCategoryFromKeywords(descVal);
+        const catInput = document.getElementById('inputCategory');
+        if (catInput) catInput.value = categoryVal;
+      }
+
+      // Requirement 1: Persistently save and update Master Catalog DB runtime & storage
+      saveRuntimeCatalogOverride(scannedBarcode, {
+        description: descVal,
+        regular_price: regularVal,
+        offer_price: offerVal,
+        arabic_description: arabicVal,
+        category: categoryVal
+      });
 
       const tagRows = document.querySelectorAll('.tag-row');
       const tagSizesArr = [];
@@ -4064,7 +4377,7 @@
       document.getElementById('regularPrice').value = item.regular_price > 0 ? item.regular_price : '';
       document.getElementById('inputOfferPrice').value = item.offer_price;
       document.getElementById('inputArabicDescription').value = item.arabic_description || '';
-      document.getElementById('inputCategory').value = item.category || '';
+      document.getElementById('inputCategory').value = item.category || detectCategoryFromKeywords(item.description);
 
       const container = document.getElementById('dynamicTagRowsContainer');
       const tagSizesToLoad = (item.tagSizes && item.tagSizes.length > 0) ? item.tagSizes : [{ size: item.tagSize || 'Small', manualSl: item.manualSl || '', note: item.note || 'S' }];
@@ -4397,7 +4710,7 @@
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, `Size_${sizeKey}`);
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
+        zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
       });
 
       const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -4535,6 +4848,26 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
           });
         }
       });
+
+      // Overlay persistent user modifications on top of raw catalog files
+      if (STATE.catalogOverrides) {
+        Object.entries(STATE.catalogOverrides).forEach(([bcode, overrideData]) => {
+          const cleanBcode = String(bcode).trim();
+          if (combinedMap.has(cleanBcode)) {
+            const existing = combinedMap.get(cleanBcode);
+            combinedMap.set(cleanBcode, {
+              ...existing,
+              ...overrideData
+            });
+          } else {
+            combinedMap.set(cleanBcode, {
+              ...overrideData,
+              sourceCatalog: 'User Edited'
+            });
+          }
+        });
+      }
+
       STATE.masterCatalog = Array.from(combinedMap.values());
     }
 
@@ -4817,9 +5150,11 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
         description: finalDesc,
         regular_price: finalReg,
         arabic_description: finalAr,
-        category: item.category || 'General',
+        category: item.category || detectCategoryFromKeywords(finalDesc) || 'General',
         sourceCatalog: 'Approved Submissions'
       };
+
+      saveRuntimeCatalogOverride(finalBarcode, approvedItem);
 
       const existingIdx = STATE.masterCatalog.findIndex(i => String(i.barcode).trim() === finalBarcode);
       if (existingIdx >= 0) {
@@ -5575,11 +5910,26 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
         return;
       }
 
-      const match = STATE.masterCatalog.find(i => String(i.barcode).trim() === rawInput);
+      // Check persistent runtime overrides first
+      const overrideMatch = STATE.catalogOverrides && STATE.catalogOverrides[rawInput] ? STATE.catalogOverrides[rawInput] : null;
+      const match = overrideMatch || STATE.masterCatalog.find(i => String(i.barcode).trim() === rawInput);
+
       if (match) {
         descInput.value = match.description || '';
-        if (match.category && catInput) catInput.value = match.category;
-        if (match.regular_price && regInput) regInput.value = parseFloat(match.regular_price).toFixed(2);
+        
+        // Requirement 2: Check Excel/Catalog Category First; if absent, run keyword detection
+        if (match.category && String(match.category).trim() !== '') {
+          if (catInput) catInput.value = match.category;
+        } else {
+          if (catInput) catInput.value = detectCategoryFromKeywords(match.description || '');
+        }
+
+        if (match.regular_price && regInput) {
+          regInput.value = parseFloat(match.regular_price) > 0 ? parseFloat(match.regular_price).toFixed(2) : '';
+        }
+        if (match.offer_price && offerInput) {
+          offerInput.value = parseFloat(match.offer_price) > 0 ? parseFloat(match.offer_price).toFixed(2) : '';
+        }
 
         if (match.arabic_description) {
           arabicDescInput.value = match.arabic_description;
@@ -5625,7 +5975,7 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
           <span class="text-cyan-900 dark:text-cyan-300 font-bold">${match.description}</span>
           <div class="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
             <span>Barcode: ${match.barcode}</span>
-            <span>Cat: ${match.category || 'General'}</span>
+            <span>Cat: ${match.category || detectCategoryFromKeywords(match.description) || 'General'}</span>
           </div>
         </div>
       `).join('');
@@ -5640,7 +5990,14 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
     function selectDescriptionSuggestion(desc, barcode, category, arabicDesc) {
       document.getElementById('inputDescription').value = desc;
       document.getElementById('barcodeInput').value = barcode;
-      if (category) document.getElementById('inputCategory').value = category;
+      
+      const catInput = document.getElementById('inputCategory');
+      if (category && category.trim() !== '') {
+        if (catInput) catInput.value = category;
+      } else {
+        if (catInput) catInput.value = detectCategoryFromKeywords(desc);
+      }
+
       if (arabicDesc) document.getElementById('inputArabicDescription').value = arabicDesc;
       document.getElementById('descSuggestionsDropdown').classList.add('hidden');
       handleBarcodeLookup();
@@ -5744,25 +6101,6 @@ zip.file(`${batch.batchName}_Size_${sizeKey}.xlsx`, excelBuffer);
       if (!STATE.role) return;
       if (STATE.idleTimer) clearTimeout(STATE.idleTimer);
       STATE.idleTimer = setTimeout(() => { logoutSystem(); showNotification('Session timed out.', 'error'); }, IDLE_TIMEOUT_MS);
-    }
-
-    function saveAdminPinSettings(event) {
-      event.preventDefault();
-      STATE.adminPin = document.getElementById('inputAdminPin').value.trim();
-      STATE.operatorDownloadPin = document.getElementById('inputOperatorDownloadPin').value.trim();
-
-      localStorage.setItem('TAGOPS_ADMIN_PIN', STATE.adminPin);
-      localStorage.setItem('TAGOPS_OPERATOR_DOWNLOAD_PIN', STATE.operatorDownloadPin);
-
-      if (window.syncSecurityPinsToFirebase) {
-        window.syncSecurityPinsToFirebase({
-          adminPin: STATE.adminPin,
-          catalogPin: STATE.operatorDownloadPin
-        });
-      }
-
-      toggleModal('securitySettingsModal');
-      showNotification('Admin PIN & Security Settings Saved to Cloud!', 'success');
     }
 
     function showNotification(message, type = 'info') {
