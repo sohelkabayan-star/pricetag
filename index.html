@@ -188,6 +188,7 @@
     body.light-mode #announcementComposerModal .glass-panel,
     body.light-mode #operatorEditModal .glass-panel,
     body.light-mode #operatorPinAuthModal .glass-panel,
+    body.light-mode #branchRulesModal .glass-panel,
     body.light-mode #historyResendPinModal .glass-panel {
       background-color: #ffffff !important;
       border: 1px solid #cbd5e1 !important;
@@ -549,6 +550,39 @@
             </div>
           </div>
 
+          <!-- DYNAMIC BRANCH BARCODE RULES MANAGER (ADMIN CARD) -->
+          <div class="glass-panel rounded-xl p-4 flex flex-col gap-3 border border-cyan-500/30">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+              <h3 class="font-semibold text-xs tracking-wider text-slate-800 dark:text-slate-300 uppercase flex items-center gap-2">
+                <i class="fa-solid fa-barcode text-cyan-600 dark:text-cyan-400"></i>
+                BRANCH BARCODE RULES (DYNAMIC WEIGHING / PLU EXTRACTION)
+              </h3>
+              <button type="button" onclick="openBranchRuleModal()" class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold flex items-center gap-1 transition shadow-sm">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add Rule
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 font-mono">Configure prefix rules to auto-slice weighing scale barcodes to catalog PLU codes dynamically.</p>
+            
+            <div class="overflow-x-auto rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/80">
+              <table class="w-full min-w-[500px] text-left text-xs border-collapse font-mono">
+                <thead class="bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800 text-cyan-700 dark:text-cyan-400">
+                  <tr>
+                    <th class="py-1.5 px-2">BRANCH / STORE</th>
+                    <th class="py-1.5 px-2">PREFIX</th>
+                    <th class="py-1.5 px-2">DIRECTION</th>
+                    <th class="py-1.5 px-2">LENGTH</th>
+                    <th class="py-1.5 px-2 text-right">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="branchRulesTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60">
+                  <tr>
+                    <td colspan="5" class="py-3 text-center text-slate-500 font-mono">No custom branch barcode rules configured.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- SECTION 2: LIVE MATRIX STREAM TABLE -->
           <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col min-h-[300px]">
             <div class="flex items-center justify-between mb-3">
@@ -720,6 +754,12 @@
             <i class="fa-solid fa-moon"></i>
           </button>
 
+          <!-- Operator Settings & Profile Button -->
+          <button onclick="openProfileSelfManagement()" class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-cyan-500/40 text-cyan-700 dark:text-cyan-300 text-xs font-bold transition shadow-sm" title="Operator Profile & PIN Settings">
+            <i class="fa-solid fa-gear"></i>
+            <span class="hidden sm:inline">Settings</span>
+          </button>
+
           <div onclick="openProfileSelfManagement()" class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-800 cursor-pointer hover:border-cyan-400 transition" title="Click to manage profile avatar and PIN">
             <div class="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 border border-cyan-500/50 flex items-center justify-center overflow-hidden shrink-0">
               <img id="opDeckUserAvatar" src="" class="w-full h-full object-cover hidden" alt="Avatar">
@@ -769,7 +809,7 @@
               </button>
             </div>
 
-            <div id="deckOpticalAcquisitionWorkspace" class="flex flex-col sm:row items-center justify-between gap-3 p-3 rounded-lg bg-white/70 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80">
+            <div id="deckOpticalAcquisitionWorkspace" class="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-lg bg-white/70 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80">
               <div class="flex items-center gap-3 w-full sm:w-auto">
                 <div id="deckAcquisitionThumbContainer" class="w-16 h-16 rounded-lg bg-slate-200 dark:bg-slate-900 border border-cyan-500/40 flex items-center justify-center overflow-hidden shrink-0">
                   <img id="deckAcquisitionThumbImg" src="" class="w-full h-full object-cover hidden" alt="Acquisition Preview">
@@ -789,58 +829,109 @@
           </div>
         </div>
 
-        <!-- DATA MAPPING & VERIFICATION FORM -->
+        <!-- DATA MAPPING & VERIFICATION FORM (WITH 100% AUTOMATED PRODUCT IMAGE PIPELINE) -->
         <div class="glass-panel rounded-xl p-4 flex flex-col gap-4">
           <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
             <h2 class="font-semibold text-sm tracking-wide text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
-              <i class="fa-solid fa-pen-to-square"></i> ITEM MATRIX VERIFICATION (COL A - G)
+              <i class="fa-solid fa-pen-to-square"></i> ITEM MATRIX VERIFICATION (COL A - I)
             </h2>
             <span id="catalogMatchBadge" class="text-xs px-2.5 py-1 rounded-md font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
               Awaiting Barcode
             </span>
           </div>
 
-          <form id="itemCommitForm" onsubmit="commitScannedItemToBatch(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm" novalidate>
+          <form id="itemCommitForm" onsubmit="commitScannedItemToBatch(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm" novalidate>
             <input type="hidden" id="editingQueueItemId" value="">
+            <input type="hidden" id="inputProductImageUrl" value="">
             
-            <div class="md:col-span-1">
-              <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL A: BARCODE *</label>
-              <input type="text" id="barcodeInput" inputmode="numeric" pattern="[0-9]*" onblur="handleBarcodeLookup()" oninput="handleBarcodeLookup()" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none transition" placeholder="Scanned/Extracted Barcode">
+            <!-- LEFT / TOP FORM CONTROLS -->
+            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="sm:col-span-1">
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-xs font-mono text-slate-600 dark:text-slate-400">COL A: BARCODE *</label>
+                  <span id="barcodeApiSpinner" class="hidden text-[10px] font-mono text-cyan-400 flex items-center gap-1">
+                    <i class="fa-solid fa-spinner animate-spin"></i> Auto Fetching Photo...
+                  </span>
+                </div>
+                <input type="text" id="barcodeInput" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onblur="handleBarcodeLookup()" oninput="handleBarcodeLookup()" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none transition" placeholder="Scanned/Extracted Barcode">
+              </div>
+
+              <div class="sm:col-span-1 relative">
+                <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL B: DESCRIPTION * (AUTO-SUGGEST)</label>
+                <input type="text" id="inputDescription" oninput="handleDescriptionAutoSuggest(event)" autocomplete="off" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:border-cyan-500 outline-none transition" placeholder="Type name for auto-suggestions...">
+                <div id="descSuggestionsDropdown" class="hidden absolute left-0 right-0 top-full mt-1 max-h-56 overflow-y-auto bg-white dark:bg-slate-900 border border-cyan-500/50 rounded-lg shadow-2xl z-50 divide-y divide-slate-100 dark:divide-slate-800 font-mono text-xs"></div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL C: QUANTITY</label>
+                <input type="number" id="inputQty" min="0" value="" placeholder="Qty" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL D: REGULAR PRICE</label>
+                <input type="number" step="0.01" id="regularPrice" onchange="checkPriceEquality()" oninput="checkPriceEquality()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none" placeholder="0.00">
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono text-cyan-700 dark:text-cyan-400 mb-1">COL E: OFFER PRICE *</label>
+                <input type="number" step="0.01" id="inputOfferPrice" onchange="checkPriceEquality()" oninput="checkPriceEquality()" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none" placeholder="0.00">
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono text-amber-700 dark:text-amber-300 mb-1">COL F: ARABIC DESCRIPTION (AUTO-TRANSLATE)</label>
+                <input type="text" id="inputArabicDescription" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-amber-900 dark:text-amber-200 outline-none focus:border-amber-400 transition" placeholder="وصف باللغة العربية (Auto / Manual)">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL H: CATEGORY</label>
+                <input type="text" id="inputCategory" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:border-cyan-500 outline-none" placeholder="Auto / Manual Category">
+              </div>
             </div>
 
-            <div class="md:col-span-1 relative">
-              <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL B: DESCRIPTION * (EXCEL AUTO-SUGGEST)</label>
-              <input type="text" id="inputDescription" oninput="handleDescriptionAutoSuggest(event)" autocomplete="off" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:border-cyan-500 outline-none transition" placeholder="Type name for auto-suggestions...">
-              <div id="descSuggestionsDropdown" class="hidden absolute left-0 right-0 top-full mt-1 max-h-56 overflow-y-auto bg-white dark:bg-slate-900 border border-cyan-500/50 rounded-lg shadow-2xl z-50 divide-y divide-slate-100 dark:divide-slate-800 font-mono text-xs"></div>
-            </div>
+            <!-- RIGHT COLUMN: AUTOMATED PRODUCT PHOTO PREVIEW & 1-CLICK DOWNLOAD -->
+            <div class="md:col-span-1 bg-slate-100 dark:bg-slate-900/70 p-3 rounded-xl border border-slate-300 dark:border-slate-800 flex flex-col justify-between gap-3">
+              <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+                <span class="text-xs font-mono text-cyan-700 dark:text-cyan-400 font-bold uppercase flex items-center gap-1.5">
+                  <i class="fa-solid fa-image"></i> COL I: PRODUCT PHOTO
+                </span>
+                <span id="productImageSourceBadge" class="text-[10px] font-mono text-slate-500">Awaiting Barcode / Photo</span>
+              </div>
 
-            <div>
-              <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL C: QUANTITY</label>
-              <input type="number" id="inputQty" min="0" value="" placeholder="Qty" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none">
-            </div>
+              <!-- Product Image Thumbnail Preview Container -->
+              <div id="colIProductPhoto" class="relative w-full h-40 bg-white dark:bg-slate-950 rounded-lg border border-slate-300 dark:border-slate-800 overflow-hidden flex items-center justify-center group">
+                <img id="formProductImagePreview" src="" class="w-full h-full object-contain p-1 hidden" alt="Product Image Preview">
+                
+                <!-- Fallback Subtle SVG Placeholder -->
+                <div id="formProductImagePlaceholder" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 gap-1 p-2 text-center">
+                  <svg class="w-12 h-12 text-slate-300 dark:text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-[10px] font-mono">100% Automated Image Pipeline Active</span>
+                </div>
 
-            <div>
-              <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL D: REGULAR PRICE</label>
-              <input type="number" step="0.01" id="regularPrice" onchange="checkPriceEquality()" oninput="checkPriceEquality()" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none" placeholder="0.00">
-            </div>
+                <!-- Clean Overlay / Actions when image is present -->
+                <button type="button" id="btnRemoveProductImage" onclick="resetColIProductPhoto()" class="hidden absolute top-2 right-2 p-1.5 rounded-lg bg-red-600/90 hover:bg-red-500 text-white text-xs shadow-md transition" title="Clear photo">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
 
-            <div>
-              <label class="block text-xs font-mono text-cyan-700 dark:text-cyan-400 mb-1">COL E: OFFER PRICE *</label>
-              <input type="number" step="0.01" id="inputOfferPrice" onchange="checkPriceEquality()" oninput="checkPriceEquality()" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:border-cyan-500 outline-none" placeholder="0.00">
-            </div>
+              <!-- Image Action Controls: 1-Click Sanitized Download & Optional Photo Override -->
+              <div class="flex flex-col gap-1.5">
+                <button type="button" id="btnDownloadProductImage" onclick="downloadProductImageWithCustomName()" class="w-full py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition disabled:opacity-40" disabled title="Download image named as [Description] [Barcode].jpg">
+                  <i class="fa-solid fa-download"></i>
+                  <span>Download Photo (.jpg)</span>
+                </button>
 
-            <div>
-              <label class="block text-xs font-mono text-amber-700 dark:text-amber-300 mb-1">COL F: ARABIC DESCRIPTION (AUTO-TRANSLATE)</label>
-              <input type="text" id="inputArabicDescription" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-amber-900 dark:text-amber-200 outline-none focus:border-amber-400 transition" placeholder="وصف باللغة العربية (Auto / Manual)">
-            </div>
-
-            <div class="md:col-span-2">
-              <label class="block text-xs font-mono text-slate-600 dark:text-slate-400 mb-1">COL H: CATEGORY</label>
-              <input type="text" id="inputCategory" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:border-cyan-500 outline-none" placeholder="Auto / Manual Category">
+                <label class="cursor-pointer py-1.5 px-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-[11px] flex items-center justify-center gap-1 text-center transition border border-slate-300 dark:border-slate-700" title="Take a clean sharp photo to override blurry image">
+                  <i class="fa-solid fa-camera text-emerald-500"></i>
+                  <span>Override With Clean Photo</span>
+                  <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleProductImageOverrideUpload(event)">
+                </label>
+              </div>
             </div>
 
             <!-- DYNAMIC MULTI-TAG ROWS CONTAINER -->
-            <div class="md:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-300 dark:border-slate-800 flex flex-col gap-3">
+            <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-300 dark:border-slate-800 flex flex-col gap-3">
               <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                 <span class="text-xs font-mono text-cyan-700 dark:text-cyan-400 font-bold">TAG SIZE &amp; NOTE MATRIX (DUPLICATION VIA MANUAL SL)</span>
                 <button type="button" id="addTagSizeBtn" onclick="addDynamicTagRow()" class="px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 dark:hover:bg-cyan-900 border border-cyan-700/50 text-cyan-800 dark:text-cyan-300 rounded text-xs font-semibold flex items-center gap-1 transition">
@@ -882,7 +973,7 @@
             </div>
 
             <!-- SUBMIT & RESET ACTIONS -->
-            <div class="md:col-span-2 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div class="md:col-span-3 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button type="button" onclick="resetVerificationForm()" class="sm:col-span-1 py-3.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition">
                 <i class="fa-solid fa-eraser text-amber-600 dark:text-amber-400"></i>
                 <span>Clear / Reset Form</span>
@@ -920,12 +1011,13 @@
                   <th class="py-2 px-3 text-right">REG</th>
                   <th class="py-2 px-3 text-right">OFFER</th>
                   <th class="py-2 px-3">ARABIC DESC</th>
+                  <th class="py-2 px-3 text-center">PHOTO</th>
                   <th class="py-2 px-3 text-right">ACTIONS</th>
                 </tr>
               </thead>
               <tbody id="operatorBatchTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60">
                 <tr>
-                  <td colspan="7" class="py-6 text-center text-slate-500 font-mono">
+                  <td colspan="8" class="py-6 text-center text-slate-500 font-mono">
                     Batch queue empty. Scan tag and click "Add to Operator Staging Batch".
                   </td>
                 </tr>
@@ -1044,7 +1136,7 @@
 
   <!-- MODAL: TAG CROPPER & OCR PARSING MODAL -->
   <div id="cropperModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[99999] flex items-center justify-center p-4">
-    <div class="glass-panel max-w-2xl w-full rounded-2xl p-5 border-cyan-500/50 flex flex-col gap-4 shadow-2xl">
+    <div class="glass-panel max-2xl w-full rounded-2xl p-5 border-cyan-500/50 flex flex-col gap-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
         <h3 class="font-bold text-sm text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
           <i class="fa-solid fa-crop-simple"></i> Crop Price Tag for Universal OCR &amp; Barcode
@@ -1100,7 +1192,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AVATAR 1:1 CROPPER MODAL (FOR OPERATOR PROFILE) -->
+  <!-- MODAL: AVATAR 1:1 CROPPER MODAL (FOR OPERATOR & ADMIN PROFILE) -->
   <div id="avatarCropperModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[99999] flex items-center justify-center p-4">
     <div class="glass-panel max-w-sm w-full rounded-2xl p-5 border-cyan-500/40 flex flex-col gap-3 shadow-2xl">
       <h3 class="font-bold text-sm text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
@@ -1130,6 +1222,7 @@
         <table class="w-full text-left text-xs border-collapse font-mono">
           <thead class="sticky top-0 bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800 text-cyan-800 dark:text-cyan-300">
             <tr>
+              <th class="py-2 px-3 text-center">Photo</th>
               <th class="py-2 px-3">Barcode</th>
               <th class="py-2 px-3">Description</th>
               <th class="py-2 px-3 text-center">Qty</th>
@@ -1431,6 +1524,50 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD / EDIT BRANCH BARCODE RULE -->
+  <div id="branchRulesModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-panel max-w-sm w-full rounded-2xl p-6 border-cyan-500/40 flex flex-col gap-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-bold text-sm text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
+          <i class="fa-solid fa-barcode"></i> <span id="branchRuleModalHeaderTitle">Add Barcode Rule</span>
+        </h3>
+        <button onclick="toggleModal('branchRulesModal')" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form onsubmit="saveBranchRuleForm(event)" class="flex flex-col gap-3 text-xs">
+        <input type="hidden" id="branchRuleId" value="">
+        
+        <div>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">BRANCH / STORE NAME *</label>
+          <input type="text" id="branchRuleName" required placeholder="e.g. Branch 01 (Bakery / Meat)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-500">
+        </div>
+
+        <div>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">BARCODE PREFIX *</label>
+          <input type="text" id="branchRulePrefix" required placeholder="e.g. 990 or 20" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 font-mono text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-500">
+        </div>
+
+        <div>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">EXTRACT DIRECTION *</label>
+          <select id="branchRuleDirection" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-500">
+            <option value="LEFT">Left / Start (Extract PLU from beginning)</option>
+            <option value="RIGHT">Right / End (Extract digits from end)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">EXTRACTED LENGTH (DIGITS) *</label>
+          <input type="number" id="branchRuleLength" min="1" max="20" required value="7" placeholder="e.g. 7" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 font-mono text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-500">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="toggleModal('branchRulesModal')" class="px-4 py-2 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-md">Save Rule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: DUAL-ADMIN PIN VERIFICATION & DEEP LINK DOWNLOAD (CLEAN MODAL CARD) -->
   <div id="operatorPinAuthModal" class="hidden fixed inset-0 bg-slate-950/90 z-[99999] flex items-start sm:items-center justify-center p-4 pt-8 sm:pt-4 overflow-y-auto">
     <div class="glass-panel max-w-sm w-full rounded-2xl p-6 border-cyan-500/60 flex flex-col gap-4 shadow-2xl relative mb-72 lg:mb-0">
@@ -1471,38 +1608,38 @@
     </div>
   </div>
 
-  <!-- OPERATOR PROFILE SELF-MANAGEMENT MODAL -->
+  <!-- OPERATOR & ADMIN PROFILE SELF-MANAGEMENT MODAL (WITH AVATAR CROP & PIN MANAGER) -->
   <div id="profileSelfModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="glass-panel max-w-md w-full rounded-2xl p-6 border-cyan-500/40 flex flex-col gap-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
         <h3 class="font-bold base text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
-          <i class="fa-solid fa-user-gear"></i> Operator Profile Self-Management
+          <i class="fa-solid fa-user-gear"></i> Profile &amp; PIN Settings
         </h3>
         <button onclick="toggleModal('profileSelfModal')" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <form onsubmit="saveProfileSelfChanges(event)" class="flex flex-col gap-3 text-xs">
         <div class="flex items-center gap-4 bg-slate-100 dark:bg-slate-900/80 p-3 rounded-xl border border-slate-300 dark:border-slate-800">
-          <div class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-950 border border-cyan-500/50 overflow-hidden flex items-center justify-center">
+          <div class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-950 border border-cyan-500/50 overflow-hidden flex items-center justify-center shrink-0">
             <img id="profileModalAvatarImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
             <i id="profileModalAvatarIcon" class="fa-solid fa-user text-2xl text-slate-500"></i>
           </div>
-          <div class="flex flex-col gap-1">
-            <label class="px-3 py-1.5 bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 dark:hover:bg-cyan-900 border border-cyan-600/50 text-cyan-800 dark:text-cyan-300 rounded-lg cursor-pointer font-semibold transition text-center">
-              <i class="fa-solid fa-camera"></i> Change &amp; Crop Avatar
+          <div class="flex flex-col gap-1 flex-1">
+            <label class="px-3 py-1.5 bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 dark:hover:bg-cyan-900 border border-cyan-600/50 text-cyan-800 dark:text-cyan-300 rounded-lg cursor-pointer font-semibold transition text-center text-xs">
+              <i class="fa-solid fa-camera"></i> Change &amp; Crop Picture
               <input type="file" id="profileAvatarFileInput" accept="image/*" class="hidden" onchange="handleProfileAvatarUpload(event)">
             </label>
-            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">1:1 Square Crop Tool</span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono text-center">1:1 Square Crop Tool • Auto-Saved</span>
           </div>
         </div>
 
         <div>
-          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">OPERATOR NAME</label>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">USER / OPERATOR NAME</label>
           <input type="text" id="inputSelfName" required class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 font-mono outline-none focus:border-cyan-500">
         </div>
 
         <div>
-          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">CHANGE ACCESS PIN</label>
+          <label class="block font-mono text-slate-600 dark:text-slate-400 mb-1">AUTHENTICATION PIN (8 DIGITS MAX)</label>
           <div class="relative flex items-center">
             <input type="password" id="inputSelfPin" inputmode="numeric" pattern="[0-9]*" required maxlength="8" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 font-mono text-slate-900 dark:text-slate-100 outline-none focus:border-cyan-500">
             <button type="button" onclick="toggleFieldPasswordVisibility('inputSelfPin', this)" class="absolute right-2.5 text-slate-400 hover:text-cyan-400">
@@ -1513,7 +1650,7 @@
 
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
           <button type="button" onclick="toggleModal('profileSelfModal')" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">Cancel</button>
-          <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md">Save Changes</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md">Save Settings</button>
         </div>
       </form>
     </div>
@@ -1544,7 +1681,7 @@
     </div>
   </div>
 
-  <!-- FIREBASE REALTIME DATABASE MODULE INTEGRATION -->
+  <!-- FIREBASE REALTIME DATABASE MODULE INTEGRATION (ACTIVE BIDIRECTIONAL SYNC ENGINE) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getDatabase, ref, set, remove, onValue, push, update } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
@@ -1562,6 +1699,28 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Master Batches Real-Time Multi-Device Cloud Sync
+    window.syncBatchToFirebase = async function(batchObj) {
+      try {
+        if (!batchObj || !batchObj.id) return;
+        await set(ref(db, 'master_batches/' + batchObj.id), batchObj);
+      } catch (err) { console.error("Firebase Batch Sync Error:", err); }
+    };
+
+    window.deleteBatchFromFirebase = async function(batchId) {
+      try {
+        await remove(ref(db, 'master_batches/' + batchId));
+      } catch (err) { console.error("Firebase Batch Delete Error:", err); }
+    };
+
+    // Active Live Listener on master_batches (triggers instantaneous update on PC Admin Deck)
+    onValue(ref(db, 'master_batches'), (snapshot) => {
+      const data = snapshot.val();
+      if (window.handleFirebaseBatchesUpdate) {
+        window.handleFirebaseBatchesUpdate(data || {});
+      }
+    });
+
     // Dynamic App Branding Cloud Sync (/appBranding)
     window.syncAppBrandingToFirebase = async function(brandingConfig) {
       try {
@@ -1578,7 +1737,7 @@
       }
     });
 
-    // Operator Accounts Cloud Sync (Unique Key CRUD on /operators path)
+    // Operator Accounts & Profile Picture Cloud Sync
     window.saveOperatorToFirebase = async function(operatorKey, operatorData) {
       try {
         let opRef;
@@ -1631,7 +1790,6 @@
       }
     });
 
-    // Fallback Listener for legacy /Operators node if needed
     onValue(ref(db, 'Operators'), (snapshot) => {
       const legacyData = snapshot.val();
       if (legacyData && (!STATE.operatorsMap || Object.keys(STATE.operatorsMap).length === 0)) {
@@ -1755,7 +1913,7 @@
       } catch (err) { console.error("Firebase Catalog Entry Delete Error:", err); }
     };
 
-    // Real-time catalog item override in Firebase
+    // Real-time catalog item override in Firebase (ONLY ON ADMIN APPROVAL)
     window.saveMasterCatalogItemOverrideToFirebase = async function(barcodeKey, itemData) {
       try {
         if (!barcodeKey) return;
@@ -1786,26 +1944,6 @@
         await set(ref(db, 'catalog_registry/files/master_approved_catalog'), directCatalogMeta);
       } catch (err) { console.error("Firebase Catalog Sync Error:", err); }
     };
-
-    // Master Transmitted Batches Cloud Sync
-    window.syncBatchToFirebase = async function(batchObj) {
-      try {
-        await set(ref(db, 'master_batches/' + batchObj.id), batchObj);
-      } catch (err) { console.error("Firebase Batch Sync Error:", err); }
-    };
-
-    window.deleteBatchFromFirebase = async function(batchId) {
-      try {
-        await remove(ref(db, 'master_batches/' + batchId));
-      } catch (err) { console.error("Firebase Batch Delete Error:", err); }
-    };
-
-    onValue(ref(db, 'master_batches'), (snapshot) => {
-      const data = snapshot.val();
-      if (data && window.handleFirebaseBatchesUpdate) {
-        window.handleFirebaseBatchesUpdate(data);
-      }
-    });
   </script>
 
   <!-- SYSTEM JAVASCRIPT ENGINE -->
@@ -1891,6 +2029,7 @@
       masterCatalog: [],
       catalogFiles: [],
       catalogOverrides: {},
+      customBranchBarcodeRules: [],
       isCatalogMatched: false,
       adminPin: '1212',
       operatorsMap: {},
@@ -1905,7 +2044,8 @@
       liveScannerInterval: null,
       idleTimer: null,
       translationDebounceTimer: null,
-      lastCropperImageSrc: ''
+      lastCropperImageSrc: '',
+      isApiFetching: false
     };
 
     const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
@@ -1933,43 +2073,45 @@
     ]);
 
     /* =========================================================================
-       SMART AUTO-CATEGORY KEYWORD RULE MATRIX
+       DYNAMIC SMART AUTO-CATEGORY RULE MATRIX
        ========================================================================= */
     const CATEGORY_KEYWORD_RULES = [
       {
-        category: "CHILLED & DAIRIES",
+        category: "OPTICAL & ACCESSORIES",
         keywords: [
-          "MILK", "LABAN", "YOGURT", "YOGHURT", "CHEESE", "BUTTER", "GHEE", "CREAM", 
-          "MARGARINE", "PANEER", "CURD", "ICE CREAM", "CHILLED", "DAIRY", "LABNEH", 
-          "MOZZARELLA", "CHEDDAR", "KRAFT", "DANONE", "ALMARAI", "NADA", "SAUDIA"
+          "SUNGLASS", "SUNGLASSES", "GLASSES", "EYEWEAR", "FRAMES", "FRAME", "LENS", 
+          "LENSES", "CONTACT LENS", "SPECTACLES", "GOGGLES", "SHADES", "WATCH", "WATCHES", 
+          "BELT", "BELTS", "WALLET", "WALLETS", "CAP", "CAPS", "HAT", "HATS", "RAYBAN", "OAKLEY"
+        ]
+      },
+      {
+        category: "CHILLED & BEVERAGES",
+        keywords: [
+          "WATER", "MINERAL WATER", "JUICE", "DRINK", "SODA", "COLA", "PEPSI", "COCA",
+          "SPRITE", "FANTA", "7UP", "MIRINDA", "TEA", "CHAI", "COFFEE", "NESCAFE", 
+          "CAPPUCCINO", "SYRUP", "ENERGY DRINK", "RED BULL", "NECTAR", "TANG", "BEVERAGE",
+          "MILK", "LABAN", "YOGURT", "YOGHURT", "CHEESE", "BUTTER", "CREAM", "LABNEH",
+          "ESPRESSO", "MATCHA", "SQUASH", "ROSE WATER", "CHILLED", "DAIRY", "ALMARAI", "NADA", "SAUDIA"
+        ]
+      },
+      {
+        category: "CONFECTIONERY & SNACKS",
+        keywords: [
+          "CHOCOLATE", "HALAWA", "HALVA", "CHIPS", "POTATO CHIPS", "CRISPS", "LAYS", 
+          "PRINGLES", "DORITOS", "BISCUIT", "BISCUITS", "COOKIES", "COOKIE", "CANDY", 
+          "WAFER", "WAFERS", "NUTS", "ALMOND", "CASHEW", "PEANUT", "CRACKER", "POPCORN", 
+          "CAKE", "CROISSANT", "SWEET", "SWEETS", "GUM", "CHEWING GUM", "TOFFEE", "LOLLY", 
+          "SNACK", "SNACKS", "GUMMY", "MARSHMALLOW", "NUTELLA", "KITKAT", "GALAXY", "SNICKERS"
         ]
       },
       {
         category: "GROCERY",
         keywords: [
-          "RICE", "OIL", "FLOUR", "ATTA", "MAIDA", "SUGAR", "SALT", "SPICE", "MASALA",
-          "DAL", "PULSE", "LENTIL", "NOODLES", "MAGGI", "PASTA", "MACARONI", "SPAGHETTI", 
-          "SAUCE", "KETCHUP", "MAYONNAISE", "VINEGAR", "SOUP", "CAN", "CANNED", "TUNA", 
-          "SARDINE", "BEANS", "CHICKPEAS", "CEREAL", "CORNFLAKES", "OATS", "WHEAT", 
-          "HONEY", "JAM", "OLIVE OIL", "SUNFLOWER OIL", "MUSTARD", "COCONUT OIL"
-        ]
-      },
-      {
-        category: "BEVERAGES",
-        keywords: [
-          "WATER", "MINERAL WATER", "JUICE", "DRINK", "SODA", "COLA", "PEPSI", "COCA",
-          "SPRITE", "FANTA", "7UP", "MIRINDA", "TEA", "CHAI", "COFFEE", "NESCAFE", 
-          "CAPPUCCINO", "SYRUP", "ENERGY DRINK", "RED BULL", "NECTAR", "TANG", "BEVERAGE",
-          "ESPRESSO", "MATCHA", "SQUASH", "ROSE WATER"
-        ]
-      },
-      {
-        category: "SNACKS & CONFECTIONERY",
-        keywords: [
-          "CHIPS", "POTATO CHIPS", "CRISPS", "LAYS", "PRINGLES", "DORITOS", "BISCUIT", 
-          "COOKIES", "CHOCOLATE", "CANDY", "WAFER", "NUTS", "ALMOND", "CASHEW", "PEANUT", 
-          "CRACKER", "POPCORN", "CAKE", "CROISSANT", "SWEET", "GUM", "CHEWING GUM", 
-          "TOFFEE", "LOLLY", "SNACK", "GUMMY"
+          "RICE", "OIL", "FLOUR", "ATTA", "MAIDA", "SUGAR", "SALT", "SPICE", "SPICES", "MASALA",
+          "DAL", "PULSE", "PULSES", "LENTIL", "LENTILS", "NOODLES", "MAGGI", "PASTA", "MACARONI", 
+          "SPAGHETTI", "SAUCE", "KETCHUP", "MAYONNAISE", "VINEGAR", "SOUP", "CAN", "CANNED", 
+          "TUNA", "SARDINE", "BEANS", "CHICKPEAS", "CEREAL", "CORNFLAKES", "OATS", "WHEAT", 
+          "HONEY", "JAM", "OLIVE OIL", "SUNFLOWER OIL", "MUSTARD", "COCONUT OIL", "GHEE"
         ]
       },
       {
@@ -1987,15 +2129,15 @@
           "SHAMPOO", "CONDITIONER", "LOTION", "TOOTHPASTE", "TOOTHBRUSH", "DEODORANT", 
           "PERFUME", "BODY SPRAY", "FACE WASH", "SHAVING", "RAZOR", "SANITIZER", "COTTON", 
           "PADS", "DIAPER", "PAMPERS", "BODY WASH", "SHOWER GEL", "HAIR OIL", "VASELINE", 
-          "CREAM", "BEAUTY", "SKINCARE", "LIP BALM"
+          "BEAUTY", "SKINCARE", "LIP BALM", "CREAM"
         ]
       },
       {
         category: "FRESH PRODUCE",
         keywords: [
           "APPLE", "BANANA", "ORANGE", "POTATO", "ONION", "TOMATO", "CARROT", "GARLIC", 
-          "GINGER", "LEMON", "LIME", "VEGETABLE", "FRUIT", "MANGO", "GRAPES", "WATERMELON", 
-          "CUCUMBER", "CHILLI", "CORIANDER", "MINT", "CAPSICUM", "CABBAGE"
+          "GINGER", "LEMON", "LIME", "VEGETABLE", "VEGETABLES", "FRUIT", "FRUITS", "MANGO", 
+          "GRAPES", "WATERMELON", "CUCUMBER", "CHILLI", "CORIANDER", "MINT", "CAPSICUM", "CABBAGE"
         ]
       },
       {
@@ -2015,8 +2157,9 @@
       {
         category: "ELECTRONICS & APPLIANCES",
         keywords: [
-          "BULB", "LED", "BATTERY", "CHARGER", "CABLE", "ADAPTER", "LIGHT", "PLUG", 
-          "WIRE", "FAN", "KETTLE", "IRON", "EXTENSION", "POWER STRIP", "HEADPHONE"
+          "BULB", "LED", "BATTERY", "BATTERIES", "CHARGER", "CABLE", "ADAPTER", "LIGHT", 
+          "PLUG", "WIRE", "FAN", "KETTLE", "IRON", "EXTENSION", "POWER STRIP", "HEADPHONE",
+          "PRESSURE COOKER", "COOKER", "BLENDER", "MIXER", "TOASTER", "OVEN", "STOVE", "PAN", "POT"
         ]
       }
     ];
@@ -2037,7 +2180,136 @@
     }
 
     /* =========================================================================
-       MASTER CATALOG OVERRIDE & REAL-TIME PERSISTENCE ENGINE
+       DYNAMIC BRANCH BARCODE RULES (CRUD MANAGER & ENGINE)
+       ========================================================================= */
+
+    function loadBranchBarcodeRules() {
+      try {
+        const stored = localStorage.getItem('customBranchBarcodeRules');
+        if (stored) {
+          STATE.customBranchBarcodeRules = JSON.parse(stored) || [];
+        } else {
+          STATE.customBranchBarcodeRules = [];
+        }
+      } catch(e) {
+        STATE.customBranchBarcodeRules = [];
+      }
+      renderBranchRulesTable();
+    }
+
+    function saveBranchBarcodeRules(rules) {
+      STATE.customBranchBarcodeRules = rules;
+      localStorage.setItem('customBranchBarcodeRules', JSON.stringify(rules));
+      renderBranchRulesTable();
+    }
+
+    function renderBranchRulesTable() {
+      const tbody = document.getElementById('branchRulesTableBody');
+      if (!tbody) return;
+
+      const rules = STATE.customBranchBarcodeRules || [];
+      if (rules.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-3 text-center text-slate-500 font-mono">No custom branch barcode rules configured.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rules.map(rule => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/60 transition border-b border-slate-200 dark:border-slate-800/40 font-mono">
+          <td class="py-2 px-2 font-semibold text-slate-800 dark:text-slate-200">${rule.name}</td>
+          <td class="py-2 px-2 text-cyan-600 dark:text-cyan-400 font-bold">${rule.prefix}</td>
+          <td class="py-2 px-2 text-slate-600 dark:text-slate-300">${rule.direction === 'RIGHT' ? 'Right / End' : 'Left / Start'}</td>
+          <td class="py-2 px-2 text-amber-600 dark:text-amber-400 font-bold">${rule.length} digits</td>
+          <td class="py-2 px-2 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <button type="button" onclick="editBranchRule('${rule.id}')" class="p-1 rounded bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 text-cyan-800 dark:text-cyan-300 text-xs transition" title="Edit Rule">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" onclick="deleteBranchRule('${rule.id}')" class="p-1 rounded bg-red-100 dark:bg-red-950 hover:bg-red-200 text-red-700 dark:text-red-300 text-xs transition" title="Delete Rule">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openBranchRuleModal() {
+      document.getElementById('branchRuleModalHeaderTitle').innerText = 'Add Barcode Rule';
+      document.getElementById('branchRuleId').value = '';
+      document.getElementById('branchRuleName').value = '';
+      document.getElementById('branchRulePrefix').value = '';
+      document.getElementById('branchRuleDirection').value = 'LEFT';
+      document.getElementById('branchRuleLength').value = '7';
+      toggleModal('branchRulesModal');
+    }
+
+    function editBranchRule(ruleId) {
+      const rule = (STATE.customBranchBarcodeRules || []).find(r => r.id === ruleId);
+      if (!rule) return;
+
+      document.getElementById('branchRuleModalHeaderTitle').innerText = `Edit Barcode Rule (${rule.name})`;
+      document.getElementById('branchRuleId').value = rule.id;
+      document.getElementById('branchRuleName').value = rule.name;
+      document.getElementById('branchRulePrefix').value = rule.prefix;
+      document.getElementById('branchRuleDirection').value = rule.direction || 'LEFT';
+      document.getElementById('branchRuleLength').value = rule.length || 7;
+      toggleModal('branchRulesModal');
+    }
+
+    function deleteBranchRule(ruleId) {
+      if (!confirm('Are you sure you want to delete this branch barcode rule?')) return;
+      const updated = (STATE.customBranchBarcodeRules || []).filter(r => r.id !== ruleId);
+      saveBranchBarcodeRules(updated);
+      showNotification('Branch barcode rule deleted.', 'info');
+    }
+
+    function saveBranchRuleForm(event) {
+      event.preventDefault();
+      const id = document.getElementById('branchRuleId').value.trim();
+      const name = document.getElementById('branchRuleName').value.trim();
+      const prefix = document.getElementById('branchRulePrefix').value.trim();
+      const direction = document.getElementById('branchRuleDirection').value;
+      const length = parseInt(document.getElementById('branchRuleLength').value) || 7;
+
+      if (!name || !prefix) {
+        showNotification('Branch name and barcode prefix are required.', 'error');
+        return;
+      }
+
+      let rules = [...(STATE.customBranchBarcodeRules || [])];
+      if (id) {
+        rules = rules.map(r => r.id === id ? { id, name, prefix, direction, length } : r);
+      } else {
+        rules.push({ id: 'rule_' + Date.now(), name, prefix, direction, length });
+      }
+
+      saveBranchBarcodeRules(rules);
+      toggleModal('branchRulesModal');
+      showNotification('Branch barcode rule saved successfully!', 'success');
+    }
+
+    function parseBarcodeWithBranchRules(rawBarcode) {
+      if (!rawBarcode) return { rawBarcode: '', searchCode: '', matchedRule: null };
+      const clean = String(rawBarcode).trim();
+      const rules = STATE.customBranchBarcodeRules || [];
+
+      for (const rule of rules) {
+        if (rule.prefix && clean.startsWith(rule.prefix)) {
+          const len = parseInt(rule.length) || clean.length;
+          let extracted = clean;
+          if (rule.direction === 'LEFT') {
+            extracted = clean.slice(0, len);
+          } else if (rule.direction === 'RIGHT') {
+            extracted = clean.slice(-len);
+          }
+          return { rawBarcode: clean, searchCode: extracted, matchedRule: rule };
+        }
+      }
+      return { rawBarcode: clean, searchCode: clean, matchedRule: null };
+    }
+
+    /* =========================================================================
+       MASTER CATALOG OVERRIDE & REAL-TIME PERSISTENCE ENGINE (STRICT ADMIN APPROVAL ONLY)
        ========================================================================= */
 
     function loadCatalogOverrides() {
@@ -2071,7 +2343,7 @@
         localStorage.setItem('TAGOPS_CATALOG_OVERRIDES', JSON.stringify(STATE.catalogOverrides));
       } catch (e) {}
 
-      // Update runtime in-memory masterCatalog array immediately
+      // Update runtime in-memory masterCatalog array immediately upon explicit approval
       const index = STATE.masterCatalog.findIndex(item => String(item.barcode || '').trim() === cleanBarcode);
       if (index >= 0) {
         STATE.masterCatalog[index] = {
@@ -2088,34 +2360,6 @@
       }
 
       updateMetrics();
-    }
-
-    /* Sync active form field edits into Master Catalog DB in real-time */
-    function syncActiveFormFieldsToCatalogDB() {
-      const barcodeInput = document.getElementById('barcodeInput');
-      const descInput = document.getElementById('inputDescription');
-      const regInput = document.getElementById('regularPrice');
-      const offerInput = document.getElementById('inputOfferPrice');
-      const arabicInput = document.getElementById('inputArabicDescription');
-      const catInput = document.getElementById('inputCategory');
-
-      if (!barcodeInput) return;
-      const barcode = barcodeInput.value.trim();
-      if (!barcode || barcode.length < 3) return;
-
-      const desc = descInput ? descInput.value.trim() : '';
-      const regVal = regInput && regInput.value !== '' ? parseFloat(regInput.value) || 0 : 0;
-      const offerVal = offerInput && offerInput.value !== '' ? parseFloat(offerInput.value) || 0 : 0;
-      const arabicDesc = arabicInput ? arabicInput.value.trim() : '';
-      const category = catInput ? catInput.value.trim() : '';
-
-      saveRuntimeCatalogOverride(barcode, {
-        description: desc,
-        regular_price: regVal,
-        offer_price: offerVal,
-        arabic_description: arabicDesc,
-        category: category
-      });
     }
 
     /* =========================================================================
@@ -2323,7 +2567,6 @@
       });
 
       // Bottom Row: Backspace, 10th Digit, Clear
-      // 1. Backspace Button
       const backBtn = document.createElement('button');
       backBtn.type = 'button';
       backBtn.className = 'keypad-btn py-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-amber-400 font-mono text-base border border-slate-700/80 shadow-md flex items-center justify-center';
@@ -2332,7 +2575,6 @@
       backBtn.onclick = () => handleKeypadBackspace(targetInputId);
       grid.appendChild(backBtn);
 
-      // 2. Tenth Shuffled Digit
       const tenthBtn = document.createElement('button');
       tenthBtn.type = 'button';
       tenthBtn.className = 'keypad-btn py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700/90 text-white font-mono font-bold text-xl border border-slate-700/80 shadow-md flex items-center justify-center';
@@ -2340,7 +2582,6 @@
       tenthBtn.onclick = () => handleKeypadDigitPress(targetInputId, tenthDigit);
       grid.appendChild(tenthBtn);
 
-      // 3. Clear Button
       const clearBtn = document.createElement('button');
       clearBtn.type = 'button';
       clearBtn.className = 'keypad-btn py-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-red-400 font-mono font-bold text-base border border-slate-700/80 shadow-md flex items-center justify-center';
@@ -2351,7 +2592,7 @@
     }
 
     function openBottomSheetKeypad(targetInputId = 'unifiedPinInput', targetFormId = 'loginPinForm') {
-      if (!isTouchDevice()) return; // HIDE ON DESKTOP COMPUTERS
+      if (!isTouchDevice()) return;
 
       STATE.activeKeypadTargetInputId = targetInputId;
       STATE.activeKeypadTargetFormId = targetFormId;
@@ -2388,16 +2629,15 @@
       renderScrambledKeypadGrid(inputId);
     }
 
-    // Auto-Reset & Shake Animation on Incorrect PIN Submission
     function triggerInvalidPinError(inputId, customMsg = 'Incorrect PIN. Please try again.') {
       playErrorBuzzSound();
       showNotification(customMsg, 'error');
 
       const input = document.getElementById(inputId);
       if (input) {
-        input.value = ''; // Auto-reset and clear field completely
+        input.value = '';
         input.classList.remove('shake-error', 'border-red-500');
-        void input.offsetWidth; // Force reflow for CSS animation restart
+        void input.offsetWidth;
         input.classList.add('shake-error', 'border-red-500');
 
         setTimeout(() => {
@@ -2464,9 +2704,266 @@
       });
     }
 
+    /* =========================================================================
+       100% AUTOMATED IMAGE PIPELINE & DEDICATED COL I RESET ENGINE
+       ========================================================================= */
+    function setProductImage(imageSrc, sourceLabel = 'Auto Stream') {
+      const previewImg = document.getElementById('formProductImagePreview');
+      const placeholder = document.getElementById('formProductImagePlaceholder');
+      const removeBtn = document.getElementById('btnRemoveProductImage');
+      const downloadBtn = document.getElementById('btnDownloadProductImage');
+      const inputImgUrl = document.getElementById('inputProductImageUrl');
+      const badge = document.getElementById('productImageSourceBadge');
+
+      if (imageSrc && imageSrc.trim()) {
+        if (previewImg) {
+          previewImg.src = imageSrc;
+          previewImg.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (removeBtn) removeBtn.classList.remove('hidden');
+        if (downloadBtn) downloadBtn.disabled = false;
+        if (inputImgUrl) inputImgUrl.value = imageSrc;
+        if (badge) badge.innerText = sourceLabel;
+      } else {
+        resetColIProductPhoto();
+      }
+    }
+
+    function resetColIProductPhoto() {
+      const previewImg = document.getElementById('formProductImagePreview');
+      const placeholder = document.getElementById('formProductImagePlaceholder');
+      const removeBtn = document.getElementById('btnRemoveProductImage');
+      const downloadBtn = document.getElementById('btnDownloadProductImage');
+      const inputImgUrl = document.getElementById('inputProductImageUrl');
+      const badge = document.getElementById('productImageSourceBadge');
+
+      if (previewImg) {
+        previewImg.src = '';
+        previewImg.classList.add('hidden');
+      }
+      if (placeholder) placeholder.classList.remove('hidden');
+      if (removeBtn) removeBtn.classList.add('hidden');
+      if (downloadBtn) downloadBtn.disabled = true;
+      if (inputImgUrl) inputImgUrl.value = '';
+      if (badge) badge.innerText = 'Awaiting Barcode / Photo';
+    }
+
+    function sanitizeOSFilename(rawName) {
+      if (!rawName) return 'Product_Image';
+      return rawName.replace(/[\/\\:\*\?"<>\|]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    async function downloadProductImageWithCustomName() {
+      const descInput = document.getElementById('inputDescription');
+      const barcodeInput = document.getElementById('barcodeInput');
+      const previewImg = document.getElementById('formProductImagePreview');
+
+      const desc = descInput ? descInput.value.trim() : '';
+      const barcode = barcodeInput ? barcodeInput.value.trim() : '';
+      const imageSrc = previewImg ? previewImg.src : '';
+
+      if (!imageSrc) {
+        showNotification('No product photo available to download.', 'error');
+        return;
+      }
+
+      const formattedName = sanitizeOSFilename(`${desc} ${barcode}`);
+      const filename = `${formattedName || 'Product_Image'}.jpg`;
+
+      try {
+        showNotification(`Downloading ${filename}...`, 'info');
+        
+        if (imageSrc.startsWith('data:')) {
+          const a = document.createElement('a');
+          a.href = imageSrc;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showNotification(`Downloaded image: ${filename}`, 'success');
+        } else {
+          try {
+            const resp = await fetch(imageSrc, { mode: 'cors' });
+            const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+            showNotification(`Downloaded image: ${filename}`, 'success');
+          } catch (corsErr) {
+            const tempImg = new Image();
+            tempImg.crossOrigin = 'anonymous';
+            tempImg.onload = function() {
+              const canvas = document.createElement('canvas');
+              canvas.width = tempImg.naturalWidth || tempImg.width;
+              canvas.height = tempImg.naturalHeight || tempImg.height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(tempImg, 0, 0);
+              canvas.toBlob((blob) => {
+                if (blob) {
+                  const blobUrl = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = blobUrl;
+                  a.download = filename;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(blobUrl);
+                  showNotification(`Downloaded image: ${filename}`, 'success');
+                } else {
+                  window.open(imageSrc, '_blank');
+                }
+              }, 'image/jpeg', 0.95);
+            };
+            tempImg.onerror = function() {
+              window.open(imageSrc, '_blank');
+              showNotification(`Direct link opened: ${filename}`, 'info');
+            };
+            tempImg.src = imageSrc;
+          }
+        }
+      } catch (err) {
+        showNotification('Download error: ' + err.message, 'error');
+      }
+    }
+
+    function handleProductImageOverrideUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          setProductImage(compressedBase64, 'Clean Photo Override');
+          showNotification('Clean photo override updated!', 'success');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    /* AUTOMATED ZERO-CLICK IMAGE FETCH ENGINE (CASCADE: Local -> Barcode API -> Title Web Proxy) */
+    async function executeAutomatedImageCascade(barcode, description = '') {
+      const spinner = document.getElementById('barcodeApiSpinner');
+      if (spinner) spinner.classList.remove('hidden');
+      STATE.isApiFetching = true;
+
+      try {
+        // STEP A: Local In-Memory / Catalog Check
+        if (barcode) {
+          const cleanBcode = String(barcode).trim();
+          const localItem = (STATE.catalogOverrides && STATE.catalogOverrides[cleanBcode]) || 
+                            STATE.masterCatalog.find(i => String(i.barcode).trim() === cleanBcode);
+          if (localItem && localItem.image_url && localItem.image_url.trim()) {
+            setProductImage(localItem.image_url.trim(), 'Local Catalog Image');
+            return localItem.image_url.trim();
+          }
+        }
+
+        // STEP B: Barcode API Background Lookup (Open Food Facts / UPCitemdb)
+        if (barcode && String(barcode).trim().length >= 5) {
+          const cleanBcode = String(barcode).trim();
+          try {
+            const offUrl = `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(cleanBcode)}.json`;
+            const resp = await fetch(offUrl, { headers: { 'User-Agent': 'TAG-OPS - Web - Version 25.0' } });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data && data.status === 1 && data.product) {
+                const img = data.product.image_front_url || data.product.image_url || data.product.selected_images?.front?.display?.en || '';
+                if (img && img.trim()) {
+                  setProductImage(img.trim(), 'Open Food Facts Image');
+                  return img.trim();
+                }
+              }
+            }
+          } catch (e) {}
+
+          try {
+            const upcUrl = `https://api.upcitemdb.com/prod/trial/lookup?upc=${encodeURIComponent(cleanBcode)}`;
+            const upcResp = await fetch(upcUrl);
+            if (upcResp.ok) {
+              const upcData = await upcResp.json();
+              if (upcData && upcData.items && upcData.items.length > 0 && upcData.items[0].images && upcData.items[0].images.length > 0) {
+                const img = upcData.items[0].images[0];
+                if (img && img.trim()) {
+                  setProductImage(img.trim(), 'UPCitemdb Image');
+                  return img.trim();
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        // STEP C: Automated Background Search by English Description
+        const queryText = (description || document.getElementById('inputDescription')?.value || '').trim();
+        const cleanQuery = stripArabicCharacters(queryText).replace(/[^a-zA-Z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+        if (cleanQuery && cleanQuery.length >= 3) {
+          try {
+            const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(cleanQuery)}&gsrnamespace=6&gsrlimit=1&prop=imageinfo&iiprop=url&format=json&origin=*`;
+            const wikiResp = await fetch(wikiUrl);
+            if (wikiResp.ok) {
+              const wikiData = await wikiResp.json();
+              if (wikiData && wikiData.query && wikiData.query.pages) {
+                const pages = Object.values(wikiData.query.pages);
+                if (pages.length > 0 && pages[0].imageinfo && pages[0].imageinfo.length > 0) {
+                  const img = pages[0].imageinfo[0].url;
+                  if (img && img.trim()) {
+                    setProductImage(img.trim(), 'Wikimedia Auto Search');
+                    return img.trim();
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+
+          try {
+            const offSearchUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanQuery)}&search_simple=1&action=process&json=1&page_size=1`;
+            const offSearchResp = await fetch(offSearchUrl, { headers: { 'User-Agent': 'TAG-OPS - Web - Version 25.0' } });
+            if (offSearchResp.ok) {
+              const offSearchData = await offSearchResp.json();
+              if (offSearchData && offSearchData.products && offSearchData.products.length > 0) {
+                const img = offSearchData.products[0].image_front_url || offSearchData.products[0].image_url || '';
+                if (img && img.trim()) {
+                  setProductImage(img.trim(), 'Product Web Search');
+                  return img.trim();
+                }
+              }
+            }
+          } catch (e) {}
+        }
+      } finally {
+        if (spinner) spinner.classList.add('hidden');
+        STATE.isApiFetching = false;
+      }
+
+      return null;
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       initAppTheme();
       loadCatalogOverrides();
+      loadBranchBarcodeRules();
       loadSystemConfigs();
       loadSavedStagingDraft();
       loadSavedOperatorHistory();
@@ -2476,7 +2973,7 @@
       setupDescriptionTranslationListener();
       setupPriceValidationListeners();
       setupBarcodeLookupListeners();
-      setupRealTimeFormPersistenceListeners();
+      setupInputClearAutoResetListeners();
       setupOperatorDirectoryDelegation();
       setupPhysicalKeyboardPinListener();
       updateDynamicTagNotes();
@@ -2487,7 +2984,9 @@
       const savedAppLogo = localStorage.getItem('TAGOPS_APP_LOGO') || DEFAULT_APP_LOGO;
       applyAppBranding(savedAppName, savedAppLogo);
 
-      // AUTO-POPUP ONLY ON MOBILE/TOUCH DEVICES (HIDDEN ON DESKTOP)
+      // Rehydrate persistent admin and active avatar UI
+      updateAvatarUIElements();
+
       if (isTouchDevice()) {
         setTimeout(() => {
           openBottomSheetKeypad('unifiedPinInput', 'loginPinForm');
@@ -2509,7 +3008,6 @@
       });
     });
 
-    // Deep link download trigger with Dual-Admin PIN security gate
     function checkForUrlDeepLinkDownload() {
       const urlParams = new URLSearchParams(window.location.search);
       const targetBatchId = urlParams.get('fileId') || urlParams.get('batchId');
@@ -2522,27 +3020,34 @@
       const barcodeInput = document.getElementById('barcodeInput');
       if (!barcodeInput) return;
 
-      barcodeInput.addEventListener('input', () => {
-        handleBarcodeLookup();
+      barcodeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleBarcodeLookup();
+        }
       });
     }
 
-    function setupRealTimeFormPersistenceListeners() {
-      const fields = [
-        'inputDescription', 
-        'regularPrice', 
-        'inputOfferPrice', 
-        'inputArabicDescription', 
-        'inputCategory'
-      ];
+    /* AUTO-RESET PRODUCT PHOTO ON INPUT CLEAR */
+    function setupInputClearAutoResetListeners() {
+      const barcodeInput = document.getElementById('barcodeInput');
+      const descInput = document.getElementById('inputDescription');
 
-      fields.forEach(fieldId => {
-        const el = document.getElementById(fieldId);
-        if (el) {
-          el.addEventListener('change', () => syncActiveFormFieldsToCatalogDB());
-          el.addEventListener('blur', () => syncActiveFormFieldsToCatalogDB());
+      const handleClearCheck = (el) => {
+        if (el && el.value.trim() === '') {
+          resetColIProductPhoto();
         }
-      });
+      };
+
+      if (barcodeInput) {
+        barcodeInput.addEventListener('input', () => handleClearCheck(barcodeInput));
+        barcodeInput.addEventListener('change', () => handleClearCheck(barcodeInput));
+      }
+
+      if (descInput) {
+        descInput.addEventListener('input', () => handleClearCheck(descInput));
+        descInput.addEventListener('change', () => handleClearCheck(descInput));
+      }
     }
 
     function saveStagingDraftLocally() {
@@ -2574,57 +3079,62 @@
 
         if (STATE.translationDebounceTimer) clearTimeout(STATE.translationDebounceTimer);
 
-        // Requirement 3: If description is completely cleared/deleted, wipe Arabic immediately
         if (!trimmedText) {
+          if (catInput) catInput.value = '';
           if (arabicInput) arabicInput.value = '';
-          syncActiveFormFieldsToCatalogDB();
+          resetColIProductPhoto();
           return;
         }
 
-        // Requirement 2: Smart Auto-Category keyword analysis fallback if Category is empty
-        if (catInput && (!catInput.value || !catInput.value.trim())) {
+        const matchedExcel = STATE.masterCatalog.find(item => 
+          item.description && item.description.trim().toLowerCase() === trimmedText.toLowerCase()
+        );
+
+        if (matchedExcel && matchedExcel.category && String(matchedExcel.category).trim() !== '') {
+          if (catInput) catInput.value = matchedExcel.category;
+        } else {
           const autoCat = detectCategoryFromKeywords(trimmedText);
-          if (autoCat) {
+          if (catInput && autoCat) {
             catInput.value = autoCat;
           }
         }
 
-        // Requirement 3: Real-time 450ms Debounced English-to-Arabic Auto-Translation
         STATE.translationDebounceTimer = setTimeout(async () => {
           const currentBarcode = document.getElementById('barcodeInput')?.value.trim();
+          const { searchCode } = parseBarcodeWithBranchRules(currentBarcode);
           
-          // Check if existing override or catalog match already contains exact Arabic
           const matchedCatalogItem = STATE.masterCatalog.find(item => 
-            (currentBarcode && String(item.barcode || '').trim() === currentBarcode) ||
+            (searchCode && String(item.barcode || '').trim() === searchCode) ||
             String(item.description || '').trim().toLowerCase() === trimmedText.toLowerCase()
           );
 
           if (matchedCatalogItem && matchedCatalogItem.arabic_description && matchedCatalogItem.description.trim().toLowerCase() === trimmedText.toLowerCase()) {
             if (arabicInput) arabicInput.value = matchedCatalogItem.arabic_description;
-            syncActiveFormFieldsToCatalogDB();
-            return;
+          } else {
+            try {
+              const cleanEnglish = stripArabicCharacters(trimmedText);
+              if (cleanEnglish) {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(cleanEnglish)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data && data[0] && data[0][0] && data[0][0][0]) {
+                  const translated = data[0][0][0].trim();
+                  if (arabicInput) {
+                    arabicInput.value = translated;
+                  }
+                }
+              }
+            } catch (err) {
+              console.warn("Google Translate auto-fetch error:", err);
+            }
           }
 
-          try {
-            const cleanEnglish = stripArabicCharacters(trimmedText);
-            if (!cleanEnglish) {
-              if (arabicInput) arabicInput.value = '';
-              return;
-            }
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(cleanEnglish)}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data && data[0] && data[0][0] && data[0][0][0]) {
-              const translated = data[0][0][0].trim();
-              if (arabicInput) {
-                arabicInput.value = translated;
-                syncActiveFormFieldsToCatalogDB();
-              }
-            }
-          } catch (err) {
-            console.warn("Google Translate auto-fetch error:", err);
+          // Trigger automated background image search if no photo currently present
+          const currentImgUrl = document.getElementById('inputProductImageUrl')?.value.trim();
+          if (!currentImgUrl && trimmedText.length >= 3) {
+            executeAutomatedImageCascade(searchCode || currentBarcode, trimmedText);
           }
-        }, 450);
+        }, 400);
       });
     }
 
@@ -2656,7 +3166,7 @@
       const formFields = document.querySelectorAll('#itemCommitForm input, #itemCommitForm select');
       formFields.forEach(field => {
         field.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
+          if (e.key === 'Enter' && field.id !== 'barcodeInput') {
             e.preventDefault();
             commitScannedItemToBatch();
           }
@@ -2753,7 +3263,6 @@
             const translated = data[0][0][0].trim();
             if (translated) {
               arabicInput.value = translated;
-              syncActiveFormFieldsToCatalogDB();
             }
           }
         } catch (err) {
@@ -2779,7 +3288,6 @@
               const sanitized = sanitizeOcrProductDescription(translated);
               if (sanitized) {
                 descInput.value = sanitized;
-                syncActiveFormFieldsToCatalogDB();
               }
             }
           }
@@ -2789,7 +3297,7 @@
       }
     }
 
-    // Real-Time Operator Update Handler supporting unique Firebase keys & legacy structures
+    // Real-Time Operator Update Handler supporting unique Firebase keys & persistent avatars
     window.handleFirebaseOperatorsUpdate = function(data) {
       if (!data) data = {};
       STATE.operatorsMap = data;
@@ -2802,7 +3310,7 @@
             id: val.id || key,
             name: val.name || '',
             pin: String(val.pin || '').trim(),
-            photo: val.photo || '',
+            photo: val.photo || localStorage.getItem(`TAGOPS_AVATAR_${val.name}`) || '',
             credId: val.credId || ''
           });
         }
@@ -2899,7 +3407,6 @@
 
       STATE.catalogFiles = [...filesArr, ...linksArr];
 
-      // Merge Cloud Overrides into local catalogOverrides
       if (cloudOverrides && Object.keys(cloudOverrides).length > 0) {
         STATE.catalogOverrides = {
           ...STATE.catalogOverrides,
@@ -2915,14 +3422,13 @@
       updateMetrics();
     };
 
+    // Instant Mobile-to-PC sync handler when batch is committed
     window.handleFirebaseBatchesUpdate = function(data) {
-      if (data) {
-        const batchArray = Object.values(data);
-        batchArray.sort((a,b) => (b.timestampRaw || 0) > (a.timestampRaw || 0) ? 1 : -1);
-        STATE.consolidatedBatches = batchArray;
-        renderMatrixTable();
-        updateMetrics();
-      }
+      const batchArray = Object.values(data || {});
+      batchArray.sort((a,b) => (b.timestampRaw || 0) > (a.timestampRaw || 0) ? 1 : -1);
+      STATE.consolidatedBatches = batchArray;
+      renderMatrixTable();
+      updateMetrics();
     };
 
     function loadSystemConfigs() {
@@ -2946,7 +3452,6 @@
       renderAnnouncementTargetChips();
     }
 
-    // Dynamic Event Delegation for User & Operator Directory
     function setupOperatorDirectoryDelegation() {
       const container = document.getElementById('operatorListContainer');
       if (!container) return;
@@ -2967,7 +3472,6 @@
       });
     }
 
-    // Render User & Operator Directory with unique Firebase Node Keys
     function renderOperatorRows() {
       const container = document.getElementById('operatorListContainer');
       if (!container) return;
@@ -3108,7 +3612,7 @@
         reader.readAsDataURL(fileInput.files[0]);
       } else {
         const existingOp = STATE.operators.find(o => o.firebaseKey === opKey);
-        const existingPhoto = existingOp ? existingOp.photo : '';
+        const existingPhoto = existingOp ? existingOp.photo : (localStorage.getItem(`TAGOPS_AVATAR_${name}`) || '');
         await executeSaveOperatorRecord(opKey, oldPin, pin, name, existingPhoto);
       }
     }
@@ -3123,6 +3627,10 @@
           credId: '',
           updatedAt: Date.now()
         };
+
+        if (photoBase64) {
+          localStorage.setItem(`TAGOPS_AVATAR_${name}`, photoBase64);
+        }
 
         if (window.saveOperatorToFirebase) {
           const savedKey = await window.saveOperatorToFirebase(opKey, operatorObj);
@@ -3279,7 +3787,7 @@
 
       greeting.innerText = `Welcome, ${STATE.operatorName}!`;
 
-      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`);
+      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`) || (STATE.role === 'ADMIN' ? localStorage.getItem('TAGOPS_AVATAR_Admin') : '');
       if (avatarSrc) {
         avatarImg.src = avatarSrc;
         avatarImg.classList.remove('hidden');
@@ -3295,7 +3803,8 @@
     }
 
     function updateAvatarUIElements() {
-      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`);
+      const userName = STATE.operatorName || 'Admin';
+      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${userName}`) || (STATE.role === 'ADMIN' ? localStorage.getItem('TAGOPS_AVATAR_Admin') : '');
       
       const headerImg = document.getElementById('headerUserAvatar');
       const headerIcon = document.getElementById('headerUserAvatarIcon');
@@ -3358,12 +3867,17 @@
       if (!canvas) return;
 
       const avatarDataUrl = canvas.toDataURL('image/png');
-      localStorage.setItem(`TAGOPS_AVATAR_${STATE.operatorName}`, avatarDataUrl);
+      const userName = STATE.operatorName || 'Admin';
+      
+      localStorage.setItem(`TAGOPS_AVATAR_${userName}`, avatarDataUrl);
 
       if (STATE.activeUserObj) {
         STATE.activeUserObj.photo = avatarDataUrl;
       }
-      if (STATE.role === 'OPERATOR' && STATE.operatorKey) {
+      if (STATE.role === 'ADMIN') {
+        STATE.adminProfile.photo = avatarDataUrl;
+        localStorage.setItem('TAGOPS_AVATAR_Admin', avatarDataUrl);
+      } else if (STATE.role === 'OPERATOR' && STATE.operatorKey) {
         const op = STATE.operators.find(o => o.firebaseKey === STATE.operatorKey);
         if (op) {
           op.photo = avatarDataUrl;
@@ -3375,7 +3889,7 @@
 
       updateAvatarUIElements();
       toggleModal('avatarCropperModal');
-      showNotification('Profile avatar updated and synced!', 'success');
+      showNotification('Profile avatar updated and synced across devices!', 'success');
     }
 
     async function saveProfileSelfChanges(event) {
@@ -3418,12 +3932,14 @@
         }
 
         const opKey = STATE.operatorKey || 'op_' + Date.now();
+        const existingAvatar = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${newName}`) || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`) || '';
+        
         const updatedOp = {
           id: opKey,
           firebaseKey: opKey,
           name: newName,
           pin: newPin,
-          photo: STATE.activeUserObj?.photo || '',
+          photo: existingAvatar,
           credId: STATE.activeUserObj?.credId || '',
           updatedAt: Date.now()
         };
@@ -3431,6 +3947,10 @@
         STATE.operatorPin = newPin;
         STATE.operatorKey = opKey;
         STATE.activeUserObj = updatedOp;
+
+        if (existingAvatar) {
+          localStorage.setItem(`TAGOPS_AVATAR_${newName}`, existingAvatar);
+        }
 
         if (window.saveOperatorToFirebase) {
           await window.saveOperatorToFirebase(opKey, updatedOp);
@@ -3749,7 +4269,7 @@
     function convertArabicDigitsToWestern(str) {
       if (!str) return '';
       const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-      const easternDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      const easternDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '٨', '۹'];
       for (let i = 0; i < 10; i++) {
         str = str.replace(new RegExp(arabicDigits[i], 'g'), i);
         str = str.replace(new RegExp(easternDigits[i], 'g'), i);
@@ -3896,11 +4416,12 @@
       let parsedOcrData = null;
 
       if (detectedBarcode) {
-        const cleanDigits = String(detectedBarcode).replace(/\D/g, '');
+        const { searchCode } = parseBarcodeWithBranchRules(detectedBarcode);
+        const cleanDigits = String(searchCode).replace(/\D/g, '');
         const excelMatch = STATE.masterCatalog.find(item => {
           const itemCode = String(item.barcode || '').trim();
           const itemDigits = itemCode.replace(/\D/g, '');
-          return itemCode === String(detectedBarcode).trim() || (cleanDigits.length >= 4 && itemDigits === cleanDigits);
+          return itemCode === String(searchCode).trim() || (cleanDigits.length >= 4 && itemDigits === cleanDigits);
         });
 
         if (excelMatch) {
@@ -3933,11 +4454,12 @@
 
       if (detectedBarcode) {
         playBeepSound();
-        const cleanDigits = String(detectedBarcode).replace(/\D/g, '');
+        const { searchCode } = parseBarcodeWithBranchRules(detectedBarcode);
+        const cleanDigits = String(searchCode).replace(/\D/g, '');
         const secondExcelCheck = STATE.masterCatalog.find(item => {
           const itemCode = String(item.barcode || '').trim();
           const itemDigits = itemCode.replace(/\D/g, '');
-          return itemCode === String(detectedBarcode).trim() || (cleanDigits.length >= 4 && itemDigits === cleanDigits);
+          return itemCode === String(searchCode).trim() || (cleanDigits.length >= 4 && itemDigits === cleanDigits);
         });
 
         if (secondExcelCheck) {
@@ -3956,28 +4478,29 @@
       const descInput = document.getElementById('inputDescription');
       const arabicDescInput = document.getElementById('inputArabicDescription');
       const regularPriceInput = document.getElementById('regularPrice');
+      const offerPriceInput = document.getElementById('inputOfferPrice');
       const catInput = document.getElementById('inputCategory');
       const badge = document.getElementById('catalogMatchBadge');
 
       const barcodeVal = scannedBarcode ? String(scannedBarcode).trim() : (tagOcrData?.barcode || '');
       if (barcodeVal) barcodeInput.value = barcodeVal;
 
-      const cleanInputDigits = barcodeVal.replace(/\D/g, '');
+      if (offerPriceInput) offerPriceInput.value = '';
 
-      // Check overrides first, then master catalog
-      const overrideMatch = STATE.catalogOverrides && STATE.catalogOverrides[barcodeVal] ? STATE.catalogOverrides[barcodeVal] : null;
+      const { searchCode } = parseBarcodeWithBranchRules(barcodeVal);
+      const cleanInputDigits = searchCode.replace(/\D/g, '');
+      const overrideMatch = STATE.catalogOverrides && STATE.catalogOverrides[searchCode] ? STATE.catalogOverrides[searchCode] : null;
 
       const match = overrideMatch || directExcelMatch || STATE.masterCatalog.find(item => {
         const itemCodeStr = String(item.barcode).trim();
         const itemDigits = itemCodeStr.replace(/\D/g, '');
-        return (barcodeVal && itemCodeStr === barcodeVal) || (cleanInputDigits.length >= 4 && itemDigits === cleanInputDigits);
+        return (searchCode && itemCodeStr === searchCode) || (cleanInputDigits.length >= 4 && itemDigits === cleanInputDigits);
       });
 
       if (match) {
         STATE.isCatalogMatched = true;
         descInput.value = match.description || '';
         
-        // Requirement 2: Excel Category First; if empty, run Smart Keyword Detection
         if (match.category && String(match.category).trim() !== '') {
           catInput.value = match.category;
         } else {
@@ -3995,6 +4518,13 @@
           regularPriceInput.value = parseFloat(match.regular_price).toFixed(2);
         } else {
           regularPriceInput.value = "";
+        }
+
+        if (match.image_url) {
+          setProductImage(match.image_url, 'Master Catalog Image');
+        } else {
+          resetColIProductPhoto();
+          executeAutomatedImageCascade(searchCode, descInput.value);
         }
 
         badge.innerText = "Catalog Match Found";
@@ -4049,10 +4579,12 @@
 
         badge.innerText = "New Item / Awaiting Approval";
         badge.className = "text-xs px-2.5 py-1 rounded-md font-mono bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 font-semibold";
+
+        // Automated Background Image Pipeline Execution
+        executeAutomatedImageCascade(searchCode, descInput.value);
       }
 
       checkPriceEquality();
-      syncActiveFormFieldsToCatalogDB();
     }
 
     async function runGeminiVisionAI(base64Image) {
@@ -4177,6 +4709,7 @@
       const offerPriceInput = document.getElementById('inputOfferPrice');
       const regularPriceInput = document.getElementById('regularPrice');
       const arabicInput = document.getElementById('inputArabicDescription');
+      const imgInput = document.getElementById('inputProductImageUrl');
       const editingId = document.getElementById('editingQueueItemId').value;
 
       if (!barcodeInput.value.trim()) {
@@ -4222,22 +4755,13 @@
 
       const arabicVal = arabicInput.value.trim();
       let categoryVal = document.getElementById('inputCategory').value.trim();
+      const productImgUrl = imgInput ? imgInput.value.trim() : '';
 
-      // Requirement 2: Smart auto-category fallback if category is empty
       if (!categoryVal) {
         categoryVal = detectCategoryFromKeywords(descVal);
         const catInput = document.getElementById('inputCategory');
         if (catInput) catInput.value = categoryVal;
       }
-
-      // Requirement 1: Persistently save and update Master Catalog DB runtime & storage
-      saveRuntimeCatalogOverride(scannedBarcode, {
-        description: descVal,
-        regular_price: regularVal,
-        offer_price: offerVal,
-        arabic_description: arabicVal,
-        category: categoryVal
-      });
 
       const tagRows = document.querySelectorAll('.tag-row');
       const tagSizesArr = [];
@@ -4268,37 +4792,33 @@
 
       checkPriceEquality();
 
-      const matchedCatalogItem = STATE.masterCatalog.find(i => String(i.barcode).trim() === scannedBarcode);
-      const isNewItem = !matchedCatalogItem;
-      const isModified = matchedCatalogItem && (
-        matchedCatalogItem.description !== descVal || 
-        parseFloat(matchedCatalogItem.regular_price || 0) !== regularVal ||
-        (matchedCatalogItem.arabic_description || '') !== arabicVal
-      );
+      const { searchCode } = parseBarcodeWithBranchRules(scannedBarcode);
+      const matchedCatalogItem = STATE.masterCatalog.find(i => String(i.barcode).trim() === searchCode || String(i.barcode).trim() === scannedBarcode);
+      const payloadType = matchedCatalogItem ? "UPDATE_ITEM" : "NEW_ITEM";
 
-      if (isNewItem || isModified) {
-        const payloadType = isNewItem ? "NEW_ITEM" : "UPDATE_ITEM";
-        const pendingPayload = {
-          Operator_Name: STATE.operatorName || 'Operator',
-          Type: payloadType,
-          type: payloadType,
-          Timestamp: formatDateTime(Date.now()),
-          barcode: scannedBarcode,
-          description: descVal,
-          regularPrice: regularVal,
-          regular_price: regularVal,
-          offerPrice: offerVal,
-          offer_price: offerVal,
-          arabicDesc: arabicVal,
-          arabic_description: arabicVal,
-          qty: finalQty,
-          category: categoryVal,
-          status: 'PENDING'
-        };
+      // ALWAYS ROUTE STRICTLY TO PENDING APPROVALS DECK (NO DIRECT MASTER CATALOG MUTATION)
+      const pendingPayload = {
+        Operator_Name: STATE.operatorName || 'Operator',
+        Type: payloadType,
+        type: payloadType,
+        Timestamp: formatDateTime(Date.now()),
+        barcode: scannedBarcode,
+        searchCode: searchCode,
+        description: descVal,
+        regularPrice: regularVal,
+        regular_price: regularVal,
+        offerPrice: offerVal,
+        offer_price: offerVal,
+        arabicDesc: arabicVal,
+        arabic_description: arabicVal,
+        qty: finalQty,
+        category: categoryVal,
+        image_url: productImgUrl,
+        status: 'PENDING'
+      };
 
-        if (window.pushPendingApprovalToFirebase) {
-          await window.pushPendingApprovalToFirebase(pendingPayload);
-        }
+      if (window.pushPendingApprovalToFirebase) {
+        await window.pushPendingApprovalToFirebase(pendingPayload);
       }
 
       if (editingId) {
@@ -4308,6 +4828,7 @@
       const consolidatedItem = {
         id: editingId || ('item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
         barcode: scannedBarcode,
+        searchCode: searchCode,
         description: stripArabicCharacters(descVal),
         qty: finalQty,
         regular_price: regularVal,
@@ -4316,6 +4837,7 @@
         tagSizes: tagSizesArr,
         note: tagSizesArr.map(t => t.note).join(', '),
         category: categoryVal,
+        image_url: productImgUrl,
         operator: STATE.operatorName || 'Operator',
         timestamp: formatDateTime(Date.now())
       };
@@ -4324,7 +4846,7 @@
       saveStagingDraftLocally();
       renderOperatorBatchQueue();
       resetVerificationForm();
-      showNotification(editingId ? 'Queue item updated successfully!' : 'Added entry to operator batch!', 'success');
+      showNotification(editingId ? 'Queue item updated & routed to pending approvals!' : 'Added entry to staging batch & routed to pending approvals!', 'success');
       setTimeout(focusBarcodeField, 50);
     }
 
@@ -4339,7 +4861,7 @@
       btnTransmit.disabled = STATE.operatorBatchQueue.length === 0;
 
       if (STATE.operatorBatchQueue.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 font-mono">Batch queue empty. Scan tag and click "Add to Operator Staging Batch".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500 font-mono">Batch queue empty. Scan tag and click "Add to Operator Staging Batch".</td></tr>`;
         return;
       }
 
@@ -4351,6 +4873,9 @@
           <td class="py-2 px-3 text-right text-slate-500 dark:text-slate-400">${parseFloat(item.regular_price) > 0 ? '$' + parseFloat(item.regular_price).toFixed(2) : '-'}</td>
           <td class="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">$${parseFloat(item.offer_price).toFixed(2)}</td>
           <td class="py-2 px-3 text-amber-700 dark:text-amber-200">${item.arabic_description || '-'}</td>
+          <td class="py-2 px-3 text-center">
+            ${item.image_url ? `<img src="${item.image_url}" class="w-7 h-7 object-cover rounded border border-cyan-500/40 mx-auto" alt="Thumb">` : `<span class="text-slate-400 text-xs">-</span>`}
+          </td>
           <td class="py-2 px-3 text-right">
             <div class="flex items-center justify-end gap-1.5">
               <button type="button" onclick="editQueuedBatchItem('${item.id}')" class="p-1.5 rounded bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 dark:hover:bg-cyan-800 text-cyan-800 dark:text-cyan-300 border border-cyan-700/50 transition text-xs" title="Edit Item in Form">
@@ -4378,6 +4903,12 @@
       document.getElementById('inputOfferPrice').value = item.offer_price;
       document.getElementById('inputArabicDescription').value = item.arabic_description || '';
       document.getElementById('inputCategory').value = item.category || detectCategoryFromKeywords(item.description);
+
+      if (item.image_url) {
+        setProductImage(item.image_url, 'Queued Image');
+      } else {
+        resetColIProductPhoto();
+      }
 
       const container = document.getElementById('dynamicTagRowsContainer');
       const tagSizesToLoad = (item.tagSizes && item.tagSizes.length > 0) ? item.tagSizes : [{ size: item.tagSize || 'Small', manualSl: item.manualSl || '', note: item.note || 'S' }];
@@ -4440,7 +4971,6 @@
       renderOperatorBatchQueue();
     }
 
-    // Direct Telegram Bot Alert with Exact Layout and Download Deep-Link
     async function sendTelegramBatchSummary(operatorName, timeStr, totalCount, batchId, existingCount, newEntriesCount) {
       const token = STATE.telegramBotToken || localStorage.getItem('TAGOPS_TELEGRAM_BOT_TOKEN');
       const chatId = STATE.telegramChatId || localStorage.getItem('TAGOPS_TELEGRAM_CHAT_ID');
@@ -4475,7 +5005,7 @@
 
       const unrolledItems = [];
       STATE.operatorBatchQueue.forEach(item => {
-        const isMaster = STATE.masterCatalog.some(cat => String(cat.barcode).trim() === String(item.barcode).trim());
+        const isMaster = STATE.masterCatalog.some(cat => String(cat.barcode).trim() === String(item.barcode).trim() || (item.searchCode && String(cat.barcode).trim() === String(item.searchCode).trim()));
         if (isMaster) {
           existingMasterCount++;
         } else {
@@ -4489,6 +5019,7 @@
               unrolledItems.push({
                 id: item.id + '_' + ts.size + '_' + i,
                 barcode: item.barcode,
+                searchCode: item.searchCode || item.barcode,
                 description: item.description,
                 qty: 1,
                 regular_price: item.regular_price,
@@ -4496,6 +5027,7 @@
                 arabic_description: item.arabic_description,
                 note: ts.note,
                 category: item.category,
+                image_url: item.image_url || '',
                 operator: item.operator,
                 timestamp: item.timestamp
               });
@@ -4507,6 +5039,7 @@
             unrolledItems.push({
               id: item.id + '_' + i,
               barcode: item.barcode,
+              searchCode: item.searchCode || item.barcode,
               description: item.description,
               qty: 1,
               regular_price: item.regular_price,
@@ -4514,6 +5047,7 @@
               arabic_description: item.arabic_description,
               note: item.note || 'S',
               category: item.category,
+              image_url: item.image_url || '',
               operator: item.operator,
               timestamp: item.timestamp
             });
@@ -4613,6 +5147,9 @@
       const tbody = document.getElementById('modalBatchTableBody');
       tbody.innerHTML = batch.items.map(item => `
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-900 transition border-b border-slate-200 dark:border-slate-800/40">
+          <td class="py-2 px-3 text-center">
+            ${item.image_url ? `<img src="${item.image_url}" class="w-8 h-8 object-cover rounded border border-cyan-500/40 mx-auto" alt="Thumb">` : `<span class="text-slate-400 text-xs">-</span>`}
+          </td>
           <td class="py-2 px-3 text-cyan-700 dark:text-cyan-300 font-bold">${item.barcode}</td>
           <td class="py-2 px-3 text-slate-800 dark:text-slate-200">${item.description}</td>
           <td class="py-2 px-3 text-center text-slate-600 dark:text-slate-300">1</td>
@@ -4635,7 +5172,7 @@
         return;
       }
 
-      const headers = ['Barcode', 'Description', 'Qty', 'Regular Price', 'Offer Price', 'Arabic Description', 'Note', 'Category'];
+      const headers = ['Barcode', 'Description', 'Qty', 'Regular Price', 'Offer Price', 'Arabic Description', 'Note', 'Category', 'Image URL'];
       const rows = [headers];
 
       batch.items.forEach(item => {
@@ -4647,8 +5184,9 @@
         const arabicStr = item.arabic_description || '';
         const noteStr = item.note || '';
         const catStr = item.category || '';
+        const imgUrlStr = item.image_url || '';
 
-        rows.push([barcodeStr, descStr, qtyVal, regVal, offerVal, arabicStr, noteStr, catStr]);
+        rows.push([barcodeStr, descStr, qtyVal, regVal, offerVal, arabicStr, noteStr, catStr, imgUrlStr]);
       });
 
       const worksheet = XLSX.utils.aoa_to_sheet(rows);
@@ -4682,7 +5220,7 @@
 
       const sizeKeys = Object.keys(grouped);
       sizeKeys.forEach(sizeKey => {
-        const headers = ['Barcode', 'Description', 'Qty', 'Regular Price', 'Offer Price', 'Arabic Description', 'Note', 'Category'];
+        const headers = ['Barcode', 'Description', 'Qty', 'Regular Price', 'Offer Price', 'Arabic Description', 'Note', 'Category', 'Image URL'];
         const rows = [headers];
 
         grouped[sizeKey].forEach(item => {
@@ -4694,7 +5232,8 @@
             (parseFloat(item.offer_price) === 0 || isNaN(parseFloat(item.offer_price))) ? "" : parseFloat(item.offer_price),
             item.arabic_description || '',
             item.note || '',
-            item.category || ''
+            item.category || '',
+            item.image_url || ''
           ]);
         });
 
@@ -4770,7 +5309,7 @@
       const fileObj = STATE.catalogFiles.find(f => f.id === fileId);
       if (!fileObj || !fileObj.items) return;
 
-      const headers = ['BARCODE', 'DESCRIPTION', 'REGULAR PRICE', 'ARABIC DESCRIPTION', 'CATEGORY', 'SOURCE CATALOG'];
+      const headers = ['BARCODE', 'DESCRIPTION', 'REGULAR PRICE', 'ARABIC DESCRIPTION', 'CATEGORY', 'IMAGE URL', 'SOURCE CATALOG'];
       const rows = [headers];
 
       fileObj.items.forEach(item => {
@@ -4781,6 +5320,7 @@
           : "";
         const arabicDescStr = String(item.arabic_description || '').trim();
         const catStr = String(item.category || '').trim();
+        const imgUrlStr = String(item.image_url || '').trim();
         const sourceStr = String(fileObj.fileName || fileObj.sourceType || 'Catalog File').trim();
 
         rows.push([
@@ -4789,6 +5329,7 @@
           regPriceVal,
           arabicDescStr,
           catStr,
+          imgUrlStr,
           sourceStr
         ]);
       });
@@ -4809,6 +5350,7 @@
         { wch: 15 },
         { wch: 30 },
         { wch: 20 },
+        { wch: 35 },
         { wch: 25 }
       ];
 
@@ -4849,7 +5391,6 @@
         }
       });
 
-      // Overlay persistent user modifications on top of raw catalog files
       if (STATE.catalogOverrides) {
         Object.entries(STATE.catalogOverrides).forEach(([bcode, overrideData]) => {
           const cleanBcode = String(bcode).trim();
@@ -4876,7 +5417,7 @@
       const file = event.target.files[0];
       if (!file) return;
 
-      showNotification('Parsing catalog Excel file & saving to cloud...', 'info');
+      showNotification('Parsing catalog Excel file & routing to pending approvals...', 'info');
 
       const reader = new FileReader();
       reader.onload = async function(e) {
@@ -4906,7 +5447,31 @@
             await window.saveCatalogFileToFirebase(catalogMeta);
           }
 
-          showNotification(`Catalog Uploaded to Cloud: ${formattedRows.length} rows stored for all devices!`, 'success');
+          // Route all imported file rows to Pending Approvals Deck for manual review
+          for (const item of formattedRows) {
+            if (window.pushPendingApprovalToFirebase) {
+              await window.pushPendingApprovalToFirebase({
+                Operator_Name: STATE.operatorName || 'Admin Import',
+                Type: 'NEW_ITEM',
+                type: 'NEW_ITEM',
+                Timestamp: formatDateTime(Date.now()),
+                barcode: item.barcode,
+                description: item.description,
+                regularPrice: item.regular_price || 0,
+                regular_price: item.regular_price || 0,
+                offerPrice: 0,
+                offer_price: 0,
+                arabicDesc: item.arabic_description || '',
+                arabic_description: item.arabic_description || '',
+                qty: 1,
+                category: item.category || detectCategoryFromKeywords(item.description) || 'General',
+                image_url: item.image_url || '',
+                status: 'PENDING'
+              });
+            }
+          }
+
+          showNotification(`Catalog Uploaded: ${formattedRows.length} rows stored & queued into Pending Approvals Deck!`, 'success');
         } catch (err) {
           showNotification('Excel Read Error: ' + err.message, 'error');
         }
@@ -4916,7 +5481,7 @@
     }
 
     function parse2DArrayRowsToCatalog(rawRows) {
-      let barcodeColIdx = -1, descColIdx = -1, arabicDescColIdx = -1, regPriceColIdx = -1, catColIdx = -1;
+      let barcodeColIdx = -1, descColIdx = -1, arabicDescColIdx = -1, regPriceColIdx = -1, catColIdx = -1, imgColIdx = -1;
       let startRowIdx = 0;
 
       if (rawRows.length > 0 && Array.isArray(rawRows[0])) {
@@ -4931,6 +5496,7 @@
           }
           if (colName.includes('REGULAR') || colName.includes('WAS') || colName.includes('PRICE')) regPriceColIdx = idx;
           if (colName.includes('CATEGORY') || colName.includes('CAT')) catColIdx = idx;
+          if (colName.includes('IMAGE') || colName.includes('PHOTO') || colName.includes('URL') || colName.includes('IMG')) imgColIdx = idx;
         });
 
         if (barcodeColIdx !== -1 || descColIdx !== -1) startRowIdx = 1;
@@ -4948,6 +5514,7 @@
         let rawDesc = String(row[descColIdx] !== undefined ? row[descColIdx] : (row[2] || '')).trim();
         let rawArabicDesc = arabicDescColIdx !== -1 ? String(row[arabicDescColIdx] || '').trim() : '';
         let rawCategory = catColIdx !== -1 ? String(row[catColIdx] || '').trim() : '';
+        let rawImage = imgColIdx !== -1 ? String(row[imgColIdx] || '').trim() : '';
 
         if (rawBarcode && rawBarcode.length >= 3) {
           formattedRows.push({
@@ -4955,7 +5522,8 @@
             description: rawDesc,
             arabic_description: rawArabicDesc,
             regular_price: regPriceColIdx !== -1 ? (parseFloat(row[regPriceColIdx]) || 0) : 0,
-            category: rawCategory
+            category: rawCategory,
+            image_url: rawImage
           });
         }
       }
@@ -5000,7 +5568,31 @@
           await window.saveCatalogLinkToFirebase(catalogMeta);
         }
 
-        if (!isSilent) showNotification(`Google Sheet Synced & Saved to Cloud: ${formattedRows.length} rows available across devices!`, 'success');
+        // Route synced items to Pending Approvals Deck for review
+        for (const item of formattedRows) {
+          if (window.pushPendingApprovalToFirebase) {
+            await window.pushPendingApprovalToFirebase({
+              Operator_Name: 'Google Sheets Sync',
+              Type: 'NEW_ITEM',
+              type: 'NEW_ITEM',
+              Timestamp: formatDateTime(Date.now()),
+              barcode: item.barcode,
+              description: item.description,
+              regularPrice: item.regular_price || 0,
+              regular_price: item.regular_price || 0,
+              offerPrice: 0,
+              offer_price: 0,
+              arabicDesc: item.arabic_description || '',
+              arabic_description: item.arabic_description || '',
+              qty: 1,
+              category: item.category || detectCategoryFromKeywords(item.description) || 'General',
+              image_url: item.image_url || '',
+              status: 'PENDING'
+            });
+          }
+        }
+
+        if (!isSilent) showNotification(`Google Sheet Synced: ${formattedRows.length} rows queued into Pending Approvals Deck!`, 'success');
       } catch (err) {
         if (!isSilent) showNotification('Google Sheets Sync Failed: ' + err.message, 'error');
       }
@@ -5151,6 +5743,7 @@
         regular_price: finalReg,
         arabic_description: finalAr,
         category: item.category || detectCategoryFromKeywords(finalDesc) || 'General',
+        image_url: item.image_url || '',
         sourceCatalog: 'Approved Submissions'
       };
 
@@ -5206,7 +5799,7 @@
       const updateItems = STATE.pendingApprovals.filter(i => i.Type !== 'NEW_ITEM');
 
       const formatSheetData = (arr) => {
-        const headers = ['Operator', 'Barcode', 'Description', 'Regular Price', 'Arabic Description', 'Timestamp'];
+        const headers = ['Operator', 'Barcode', 'Description', 'Regular Price', 'Arabic Description', 'Image URL', 'Timestamp'];
         const rows = [headers];
         arr.forEach(item => {
           rows.push([
@@ -5215,6 +5808,7 @@
             item.description || '',
             (parseFloat(item.regular_price) === 0 || isNaN(parseFloat(item.regular_price))) ? "" : parseFloat(item.regular_price),
             item.arabic_description || '',
+            item.image_url || '',
             item.Timestamp || ''
           ]);
         });
@@ -5571,7 +6165,6 @@
       showNotification('Action canceled: Admin Security PIN Required', 'info');
     }
 
-    // Dual-Admin PIN verification (Rejects unauthorized inputs with auto-reset & reshuffle)
     function verifyOperatorPinAuth(event) {
       event.preventDefault();
       const enteredPin = document.getElementById('inputAuthOperatorPin').value.trim();
@@ -5600,7 +6193,7 @@
     }
 
     function performExportAllConsolidatedCatalogs() {
-      const headers = ['BARCODE', 'DESCRIPTION', 'REGULAR PRICE', 'ARABIC DESCRIPTION', 'CATEGORY', 'SOURCE CATALOG'];
+      const headers = ['BARCODE', 'DESCRIPTION', 'REGULAR PRICE', 'ARABIC DESCRIPTION', 'CATEGORY', 'IMAGE URL', 'SOURCE CATALOG'];
       const rows = [headers];
 
       STATE.masterCatalog.forEach(item => {
@@ -5611,6 +6204,7 @@
           : "";
         const arabicDescStr = String(item.arabic_description || '').trim();
         const catStr = String(item.category || '').trim();
+        const imgUrlStr = String(item.image_url || '').trim();
         const sourceStr = String(item.sourceCatalog || item.sourceType || 'Master Catalog').trim();
 
         rows.push([
@@ -5619,6 +6213,7 @@
           regPriceVal,
           arabicDescStr,
           catStr,
+          imgUrlStr,
           sourceStr
         ]);
       });
@@ -5626,20 +6221,21 @@
       const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
       for (let r = 1; r < rows.length; r++) {
-        const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 }); // Column A: BARCODE
+        const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
         if (worksheet[cellRef]) {
-          worksheet[cellRef].t = 's'; // Set cell type to String
-          worksheet[cellRef].z = '@'; // Set display format to Text
+          worksheet[cellRef].t = 's';
+          worksheet[cellRef].z = '@';
         }
       }
 
       worksheet['!cols'] = [
-        { wch: 18 }, // A: BARCODE
-        { wch: 35 }, // B: DESCRIPTION
-        { wch: 15 }, // C: REGULAR PRICE
-        { wch: 30 }, // D: ARABIC DESCRIPTION
-        { wch: 20 }, // E: CATEGORY
-        { wch: 25 }  // F: SOURCE CATALOG
+        { wch: 18 },
+        { wch: 35 },
+        { wch: 15 },
+        { wch: 30 },
+        { wch: 20 },
+        { wch: 35 },
+        { wch: 25 }
       ];
 
       const workbook = XLSX.utils.book_new();
@@ -5657,7 +6253,7 @@
       const log = STATE.operatorHistoryLogs.find(l => l.batchName === batchName);
       if (!log || !log.items) return;
 
-      const headers = ['BARCODE', 'DESCRIPTION', 'QTY', 'REGULAR PRICE', 'OFFER PRICE', 'ARABIC DESCRIPTION', 'NOTE', 'CATEGORY'];
+      const headers = ['BARCODE', 'DESCRIPTION', 'QTY', 'REGULAR PRICE', 'OFFER PRICE', 'ARABIC DESCRIPTION', 'NOTE', 'CATEGORY', 'IMAGE URL'];
       const rows = [headers];
 
       log.items.forEach(i => {
@@ -5669,7 +6265,8 @@
           (parseFloat(i.offer_price) === 0 || isNaN(parseFloat(i.offer_price))) ? "" : parseFloat(i.offer_price),
           i.arabic_description || '',
           i.note || '',
-          i.category || ''
+          i.category || '',
+          i.image_url || ''
         ]);
       });
 
@@ -5733,6 +6330,7 @@
                 type: 'RESEND_BATCH',
                 Timestamp: formatDateTime(Date.now()),
                 barcode: item.barcode,
+                searchCode: item.searchCode || item.barcode,
                 description: item.description,
                 regularPrice: item.regular_price,
                 regular_price: item.regular_price,
@@ -5742,6 +6340,7 @@
                 arabic_description: item.arabic_description,
                 qty: 1,
                 category: item.category,
+                image_url: item.image_url || '',
                 status: 'PENDING'
               });
             }
@@ -5899,25 +6498,30 @@
       const offerInput = document.getElementById('inputOfferPrice');
       const catInput = document.getElementById('inputCategory');
 
+      // COL E (Offer Price) NEVER auto-populates on lookup - always left empty
+      if (offerInput) offerInput.value = '';
+
       if (!rawInput) {
         badge.innerText = "Awaiting Barcode";
         badge.className = "text-xs px-2.5 py-1 rounded-md font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border border-slate-300 dark:border-slate-700";
         if (descInput) descInput.value = '';
         if (arabicDescInput) arabicDescInput.value = '';
         if (regInput) regInput.value = '';
-        if (offerInput) offerInput.value = '';
         if (catInput) catInput.value = '';
+        resetColIProductPhoto();
         return;
       }
 
-      // Check persistent runtime overrides first
-      const overrideMatch = STATE.catalogOverrides && STATE.catalogOverrides[rawInput] ? STATE.catalogOverrides[rawInput] : null;
-      const match = overrideMatch || STATE.masterCatalog.find(i => String(i.barcode).trim() === rawInput);
+      // Check against Dynamic Branch Barcode Rules (PLU Extraction)
+      const { searchCode, matchedRule } = parseBarcodeWithBranchRules(rawInput);
+
+      // STEP A: Check local catalog database first
+      const overrideMatch = STATE.catalogOverrides && (STATE.catalogOverrides[searchCode] || STATE.catalogOverrides[rawInput]);
+      const match = overrideMatch || STATE.masterCatalog.find(i => String(i.barcode).trim() === searchCode || String(i.barcode).trim() === rawInput);
 
       if (match) {
         descInput.value = match.description || '';
         
-        // Requirement 2: Check Excel/Catalog Category First; if absent, run keyword detection
         if (match.category && String(match.category).trim() !== '') {
           if (catInput) catInput.value = match.category;
         } else {
@@ -5927,9 +6531,6 @@
         if (match.regular_price && regInput) {
           regInput.value = parseFloat(match.regular_price) > 0 ? parseFloat(match.regular_price).toFixed(2) : '';
         }
-        if (match.offer_price && offerInput) {
-          offerInput.value = parseFloat(match.offer_price) > 0 ? parseFloat(match.offer_price).toFixed(2) : '';
-        }
 
         if (match.arabic_description) {
           arabicDescInput.value = match.arabic_description;
@@ -5938,17 +6539,29 @@
           await autoTranslateEnglishToArabicIfEmpty(match.description);
         }
 
-        badge.innerText = "Catalog Match Found";
+        if (match.image_url) {
+          setProductImage(match.image_url, 'Master Catalog Image');
+        } else {
+          resetColIProductPhoto();
+          executeAutomatedImageCascade(searchCode, descInput.value);
+        }
+
+        badge.innerText = matchedRule ? `Catalog Match (${matchedRule.name})` : "Catalog Match Found";
         badge.className = "text-xs px-2.5 py-1 rounded-md font-mono bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/40 font-semibold";
       } else {
+        // STEP B & C: Not in local catalog -> Trigger 100% automated background image cascade
         descInput.value = '';
         arabicDescInput.value = '';
         if (regInput) regInput.value = '';
-        if (offerInput) offerInput.value = '';
         if (catInput) catInput.value = '';
+        resetColIProductPhoto();
 
         badge.innerText = "New Item / Awaiting Approval";
         badge.className = "text-xs px-2.5 py-1 rounded-md font-mono bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 font-semibold";
+
+        if (searchCode.length >= 5 || rawInput.length >= 5) {
+          executeAutomatedImageCascade(searchCode || rawInput, '');
+        }
       }
     }
 
@@ -5971,8 +6584,11 @@
       }
 
       dropdown.innerHTML = matches.map(match => `
-        <div onclick="selectDescriptionSuggestion('${escapeQuotes(match.description)}', '${match.barcode}', '${escapeQuotes(match.category || '')}', '${escapeQuotes(match.arabic_description || '')}')" class="p-2 hover:bg-cyan-100 dark:hover:bg-cyan-950/80 cursor-pointer transition flex flex-col gap-0.5">
-          <span class="text-cyan-900 dark:text-cyan-300 font-bold">${match.description}</span>
+        <div onclick="selectDescriptionSuggestion('${escapeQuotes(match.description)}', '${match.barcode}', '${escapeQuotes(match.category || '')}', '${escapeQuotes(match.arabic_description || '')}', '${escapeQuotes(match.image_url || '')}')" class="p-2 hover:bg-cyan-100 dark:hover:bg-cyan-950/80 cursor-pointer transition flex flex-col gap-0.5">
+          <div class="flex items-center justify-between">
+            <span class="text-cyan-900 dark:text-cyan-300 font-bold">${match.description}</span>
+            ${match.image_url ? `<img src="${match.image_url}" class="w-5 h-5 object-cover rounded" alt="Thumb">` : ''}
+          </div>
           <div class="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
             <span>Barcode: ${match.barcode}</span>
             <span>Cat: ${match.category || detectCategoryFromKeywords(match.description) || 'General'}</span>
@@ -5987,7 +6603,7 @@
       return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
-    function selectDescriptionSuggestion(desc, barcode, category, arabicDesc) {
+    function selectDescriptionSuggestion(desc, barcode, category, arabicDesc, imgUrl) {
       document.getElementById('inputDescription').value = desc;
       document.getElementById('barcodeInput').value = barcode;
       
@@ -5998,7 +6614,13 @@
         if (catInput) catInput.value = detectCategoryFromKeywords(desc);
       }
 
+      const offerInput = document.getElementById('inputOfferPrice');
+      if (offerInput) offerInput.value = '';
+
       if (arabicDesc) document.getElementById('inputArabicDescription').value = arabicDesc;
+      if (imgUrl) setProductImage(imgUrl, 'Catalog Suggestion');
+      else executeAutomatedImageCascade(barcode, desc);
+
       document.getElementById('descSuggestionsDropdown').classList.add('hidden');
       handleBarcodeLookup();
     }
@@ -6014,6 +6636,9 @@
     function resetVerificationForm() {
       document.getElementById('itemCommitForm').reset();
       document.getElementById('editingQueueItemId').value = '';
+      document.getElementById('inputProductImageUrl').value = '';
+      resetColIProductPhoto();
+
       document.getElementById('submitBtnText').innerText = "ADD TO OPERATOR STAGING BATCH";
       document.getElementById('catalogMatchBadge').innerText = "Awaiting Barcode";
       document.getElementById('catalogMatchBadge').className = "text-xs px-2.5 py-1 rounded-md font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border border-slate-300 dark:border-slate-700";
