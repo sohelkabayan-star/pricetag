@@ -279,7 +279,7 @@
       animation: bounceShort 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* NEXUS NOTICE POPUP MODAL & POSTER STYLING (FIXED OVERFLOW & NO BADGE CLIPPING) */
+    /* NEXUS NOTICE POPUP MODAL & POSTER STYLING */
     .nexuspay-overlay,
     .announcement-modal-overlay {
       position: fixed;
@@ -293,7 +293,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 3.5rem 1rem 1.5rem 1rem !important; /* Top padding ensures top badge is never cut off */
+      padding: 3.5rem 1rem 1.5rem 1rem !important;
       overflow-y: auto;
     }
 
@@ -308,7 +308,7 @@
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       text-align: center;
       color: #111111;
-      overflow: visible !important; /* Fix badge clipping completely */
+      overflow: visible !important;
       display: flex;
       flex-direction: column;
       margin-top: 15px;
@@ -1281,8 +1281,10 @@
         <img id="avatarCropperImage" class="max-w-full block" src="" alt="Avatar Crop">
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="document.getElementById('avatarCropperModal').classList.add('hidden')" class="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-800 text-xs text-slate-700 dark:text-slate-300">Cancel</button>
-        <button type="button" onclick="saveCroppedAvatarImage()" class="px-4 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-xs text-white font-semibold shadow-md">Apply 1:1 Avatar</button>
+        <button type="button" onclick="if(STATE.avatarCropper){STATE.avatarCropper.destroy(); STATE.avatarCropper=null;} document.getElementById('avatarCropperModal').classList.add('hidden')" class="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-800 text-xs text-slate-700 dark:text-slate-300">Cancel</button>
+        <button type="button" id="btnApplyAvatarCropper" onclick="saveCroppedAvatarImage()" class="px-4 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-xs text-white font-semibold shadow-md flex items-center gap-1.5">
+          <span id="btnApplyAvatarCropperText">Apply 1:1 Avatar</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2002,7 +2004,7 @@
               <i class="fa-solid fa-camera"></i> Change &amp; Crop Picture
               <input type="file" id="profileAvatarFileInput" accept="image/*" class="hidden" onchange="handleProfileAvatarUpload(event)">
             </label>
-            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono text-center">1:1 Square Crop Tool • Auto-Saved</span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono text-center">1:1 Square Crop Tool • Cloud Synced</span>
           </div>
         </div>
 
@@ -2380,9 +2382,8 @@
 
     window.handleFirebaseAdminProfileUpdate = function(data) {
       if (data) {
-        if (data.photo) {
-          STATE.adminProfile.photo = data.photo;
-          localStorage.setItem('TAGOPS_AVATAR_Admin', data.photo);
+        if (data.photo !== undefined) {
+          STATE.adminProfile.photo = data.photo || '';
         }
         if (data.name) {
           STATE.adminProfile.name = data.name;
@@ -3142,7 +3143,7 @@
 
     function handleKeypadDigitPress(inputId, digit) {
       const input = document.getElementById(inputId);
-if (!input) return;
+      if (!input) return;
       if (input.value.length < 8) {
         input.value += digit;
       }
@@ -3414,7 +3415,6 @@ if (!input) return;
       STATE.isApiFetching = true;
 
       try {
-        // 1. Local / Catalog Cache Priority
         if (barcode) {
           const cleanBcode = String(barcode).trim();
           const localItem = (STATE.catalogOverrides && STATE.catalogOverrides[cleanBcode]) || 
@@ -3425,7 +3425,6 @@ if (!input) return;
           }
         }
 
-        // 2. Tier 1: EAN / UPC Open Data Lookups
         if (barcode && String(barcode).trim().length >= 4) {
           const cleanBcode = String(barcode).trim();
           
@@ -3475,7 +3474,6 @@ if (!input) return;
           } catch (e) {}
         }
 
-        // 3. Tier 2: Pixabay API (High-Quality Generic/Product Images)
         const queryText = (description || document.getElementById('inputDescription')?.value || '').trim();
         let cleanQuery = stripArabicCharacters(queryText);
         
@@ -3511,7 +3509,6 @@ if (!input) return;
              console.warn("Pixabay API fetch failed:", e);
           }
 
-          // 4. Tier 3: Wikimedia PageImages API (Fallback for Generic Items)
           try {
              const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(cleanQuery.split(' ')[0])}&prop=pageimages&format=json&pithumbsize=500&origin=*`;
              const wikiResp = await fetch(wikiUrl);
@@ -3537,7 +3534,6 @@ if (!input) return;
       } finally {
         if (spinner) spinner.classList.add('hidden');
         STATE.isApiFetching = false;
-        // Tier 4: Category SVG Fallback is handled automatically by the onerror attributes on the <img> tags
       }
 
       return null;
@@ -3644,7 +3640,8 @@ if (!input) return;
       if (enteredPin === validAdminPin || enteredPin === validCatalogPin || isOperatorMatch) {
         closeBottomSheetKeypad();
         const modal = document.getElementById('telegramDownloadAuthModal');
-        if (modal) modal.classList.add('hidden');
+        if (modal)
+          modal.classList.add('hidden');
 
         showNotification('PIN Verified! Starting Excel download...', 'success');
         playBeepSound();
@@ -3760,7 +3757,6 @@ if (!input) return;
           }
 
           const currentImgUrl = document.getElementById('inputProductImageUrl')?.value.trim();
-          // Always try to fetch image based on description if it's substantial, regardless of barcode presence
           if (!currentImgUrl && trimmedText.length >= 3) {
             executeAutomatedImageCascade(searchCode || currentBarcode, trimmedText);
           }
@@ -3940,7 +3936,7 @@ if (!input) return;
             name: val.name || '',
             role: val.role || 'INVENTORY',
             pin: String(val.pin || '').trim(),
-            photo: val.photo || localStorage.getItem(`TAGOPS_AVATAR_${val.name}`) || '',
+            photo: val.photo || '',
             credId: val.credId || ''
           });
         }
@@ -4133,7 +4129,7 @@ if (!input) return;
         const displayName = op.name ? op.name : '<span class="text-amber-500 italic">[Incomplete / Orphan Record]</span>';
         const displayPin = op.pin || 'N/A';
         const opRole = op.role || 'INVENTORY';
-        const savedAvatar = op.photo || localStorage.getItem(`TAGOPS_AVATAR_${op.name}`) || '';
+        const savedAvatar = op.photo || '';
         const pinSpanId = `op_pin_display_${idx}`;
 
         return `
@@ -4257,13 +4253,30 @@ if (!input) return;
 
       if (fileInput.files && fileInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = async function(e) {
-          await executeSaveOperatorRecord(opKey, oldPin, pin, name, role, e.target.result);
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = async function() {
+            const canvas = document.createElement('canvas');
+            const maxDim = 120;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressedAvatar = canvas.toDataURL('image/jpeg', 0.65);
+            await executeSaveOperatorRecord(opKey, oldPin, pin, name, role, compressedAvatar);
+          };
+          img.src = e.target.result;
         };
         reader.readAsDataURL(fileInput.files[0]);
       } else {
         const existingOp = STATE.operators.find(o => o.firebaseKey === opKey);
-        const existingPhoto = existingOp ? existingOp.photo : (localStorage.getItem(`TAGOPS_AVATAR_${name}`) || '');
+        const existingPhoto = existingOp ? existingOp.photo : '';
         await executeSaveOperatorRecord(opKey, oldPin, pin, name, role, existingPhoto);
       }
     }
@@ -4280,17 +4293,13 @@ if (!input) return;
           updatedAt: Date.now()
         };
 
-        if (photoBase64) {
-          localStorage.setItem(`TAGOPS_AVATAR_${name}`, photoBase64);
-        }
-
         if (window.saveOperatorToFirebase) {
           const savedKey = await window.saveOperatorToFirebase(opKey, operatorObj);
           operatorObj.firebaseKey = savedKey;
         }
 
         toggleModal('operatorEditModal');
-        showNotification(`Operator profile saved for ${name}`, 'success');
+        showNotification(`Operator profile saved and synced to Cloud for ${name}`, 'success');
       } catch(err) {
         showNotification('Error saving operator: ' + err.message, 'error');
       }
@@ -4448,7 +4457,7 @@ if (!input) return;
 
       greeting.innerText = `Welcome, ${STATE.operatorName}!`;
 
-      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`) || (STATE.role === 'ADMIN' ? localStorage.getItem('TAGOPS_AVATAR_Admin') : '');
+      const avatarSrc = STATE.activeUserObj?.photo || (STATE.role === 'ADMIN' ? STATE.adminProfile.photo : '');
       if (avatarSrc) {
         avatarImg.src = avatarSrc;
         avatarImg.classList.remove('hidden');
@@ -4464,8 +4473,7 @@ if (!input) return;
     }
 
     function updateAvatarUIElements() {
-      const userName = STATE.operatorName || 'Admin';
-      const avatarSrc = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${userName}`) || (STATE.role === 'ADMIN' ? localStorage.getItem('TAGOPS_AVATAR_Admin') : '');
+      const avatarSrc = STATE.activeUserObj?.photo || (STATE.role === 'ADMIN' ? STATE.adminProfile.photo : '');
       
       const headerImg = document.getElementById('headerUserAvatar');
       const headerIcon = document.getElementById('headerUserAvatarIcon');
@@ -4478,7 +4486,7 @@ if (!input) return;
         if (headerImg) { headerImg.src = avatarSrc; headerImg.classList.remove('hidden'); }
         if (headerIcon) headerIcon.classList.add('hidden');
         if (modalImg) { modalImg.src = avatarSrc; modalImg.classList.remove('hidden'); }
-        if (modalIcon) modalIcon.classList.remove('hidden');
+        if (modalIcon) modalIcon.classList.add('hidden');
         if (opDeckAvatar) { opDeckAvatar.src = avatarSrc; opDeckAvatar.classList.remove('hidden'); }
         if (opDeckIcon) opDeckIcon.classList.add('hidden');
       } else {
@@ -4503,13 +4511,20 @@ if (!input) return;
       const file = event.target.files[0];
       if (!file) return;
 
+      showNotification('Loading image into 1:1 cropper...', 'info');
+
       const reader = new FileReader();
       reader.onload = function(e) {
         const cropperImg = document.getElementById('avatarCropperImage');
         cropperImg.src = e.target.result;
-        toggleModal('avatarCropperModal');
+        
+        const modal = document.getElementById('avatarCropperModal');
+        if (modal) modal.classList.remove('hidden');
 
-        if (STATE.avatarCropper) STATE.avatarCropper.destroy();
+        if (STATE.avatarCropper) {
+          STATE.avatarCropper.destroy();
+          STATE.avatarCropper = null;
+        }
 
         STATE.avatarCropper = new Cropper(cropperImg, {
           aspectRatio: 1,
@@ -4522,42 +4537,62 @@ if (!input) return;
       event.target.value = '';
     }
 
-    function saveCroppedAvatarImage() {
+    async function saveCroppedAvatarImage() {
       if (!STATE.avatarCropper) return;
-      const canvas = STATE.avatarCropper.getCroppedCanvas({ width: 250, height: 250 });
-      if (!canvas) return;
-
-      const avatarDataUrl = canvas.toDataURL('image/png');
-      const userName = STATE.operatorName || 'Admin';
       
-      localStorage.setItem(`TAGOPS_AVATAR_${userName}`, avatarDataUrl);
+      const btnText = document.getElementById('btnApplyAvatarCropperText');
+      const btn = document.getElementById('btnApplyAvatarCropper');
+      if (btnText) btnText.innerText = 'Syncing Cloud...';
+      if (btn) btn.disabled = true;
+
+      const canvas = STATE.avatarCropper.getCroppedCanvas({ width: 120, height: 120 });
+      if (!canvas) {
+        if (btnText) btnText.innerText = 'Apply 1:1 Avatar';
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      const avatarDataUrl = canvas.toDataURL('image/jpeg', 0.65);
 
       if (STATE.activeUserObj) {
         STATE.activeUserObj.photo = avatarDataUrl;
       }
-      if (STATE.role === 'ADMIN') {
-        STATE.adminProfile.photo = avatarDataUrl;
-        localStorage.setItem('TAGOPS_AVATAR_Admin', avatarDataUrl);
-        if (window.syncAdminProfileToFirebase) {
-          window.syncAdminProfileToFirebase(STATE.adminProfile).catch(e => console.warn(e));
-        }
-      } else if (STATE.role === 'OPERATOR' && STATE.operatorKey) {
-        const op = STATE.operators.find(o => o.firebaseKey === STATE.operatorKey);
-        if (op) {
-          op.photo = avatarDataUrl;
-          if (window.saveOperatorToFirebase) {
-            window.saveOperatorToFirebase(STATE.operatorKey, op).catch(e => console.warn(e));
+
+      try {
+        if (STATE.role === 'ADMIN') {
+          STATE.adminProfile.photo = avatarDataUrl;
+          if (window.syncAdminProfileToFirebase) {
+            await window.syncAdminProfileToFirebase(STATE.adminProfile);
+          }
+        } else if (STATE.role === 'OPERATOR' && STATE.operatorKey) {
+          const op = STATE.operators.find(o => o.firebaseKey === STATE.operatorKey);
+          if (op) {
+            op.photo = avatarDataUrl;
+            if (window.saveOperatorToFirebase) {
+              await window.saveOperatorToFirebase(STATE.operatorKey, op);
+            }
           }
         }
+        showNotification('Profile avatar synced across all devices in real time!', 'success');
+      } catch (err) {
+        showNotification('Firebase sync warning: ' + err.message, 'info');
+      } finally {
+        if (btnText) btnText.innerText = 'Apply 1:1 Avatar';
+        if (btn) btn.disabled = false;
       }
 
+      STATE.avatarCropper.destroy();
+      STATE.avatarCropper = null;
+
       updateAvatarUIElements();
-      toggleModal('avatarCropperModal');
-      showNotification('Profile avatar updated and synced across devices!', 'success');
+      
+      const modal = document.getElementById('avatarCropperModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     async function saveProfileSelfChanges(event) {
-      event.preventDefault();
+      if (event && event.preventDefault) event.preventDefault();
+      
       const newName = document.getElementById('inputSelfName').value.trim();
       const newPin = document.getElementById('inputSelfPin').value.trim();
 
@@ -4569,7 +4604,7 @@ if (!input) return;
       if (STATE.role === 'ADMIN') {
         const collision = STATE.operators.find(o => o.pin === newPin);
         if (collision) {
-          showNotification('এই পিনটি ইতোমধ্যে একজন অপারেটর ব্যবহার করছেন, অন্য পিন দিন', 'error');
+          showNotification('This PIN is already assigned to another operator. Please choose a different PIN.', 'error');
           return;
         }
 
@@ -4589,18 +4624,18 @@ if (!input) return;
         }
       } else {
         if (newPin === STATE.adminPin) {
-          showNotification('এই পিনটি ইতোমধ্যে এডমিন পিন হিসেবে ব্যবহৃত, অন্য পিন দিন', 'error');
+          showNotification('This PIN matches the Admin PIN. Please choose a different PIN.', 'error');
           return;
         }
 
         const collision = STATE.operators.find(o => o.pin === newPin && o.firebaseKey !== STATE.operatorKey);
         if (collision) {
-          showNotification('এই পিনটি ইতোমধ্যে ব্যবহৃত, অন্য পিন দিন', 'error');
+          showNotification('This PIN is already assigned. Please choose a different PIN.', 'error');
           return;
         }
 
         const opKey = STATE.operatorKey || 'op_' + Date.now();
-        const existingAvatar = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${newName}`) || localStorage.getItem(`TAGOPS_AVATAR_${STATE.operatorName}`) || '';
+        const existingAvatar = STATE.activeUserObj?.photo || '';
         
         const updatedOp = {
           id: opKey,
@@ -4617,26 +4652,27 @@ if (!input) return;
         STATE.operatorKey = opKey;
         STATE.activeUserObj = updatedOp;
 
-        if (existingAvatar) {
-          localStorage.setItem(`TAGOPS_AVATAR_${newName}`, existingAvatar);
-        }
-
         if (window.saveOperatorToFirebase) {
           await window.saveOperatorToFirebase(opKey, updatedOp);
         }
       }
 
       STATE.operatorName = newName;
-      document.getElementById('operatorNameDisplay').innerText = newName;
+      const nameDisplay = document.getElementById('operatorNameDisplay');
+      if (nameDisplay) nameDisplay.innerText = newName;
+      
       const historyUserLabel = document.getElementById('historyUserLabel');
       if (historyUserLabel) historyUserLabel.innerText = newName;
+      
       const opDeckUserName = document.getElementById('opDeckUserName');
       if (opDeckUserName) opDeckUserName.innerText = newName;
 
-      toggleModal('profileSelfModal');
+      const profileModal = document.getElementById('profileSelfModal');
+      if (profileModal) profileModal.classList.add('hidden');
+
       renderOperatorRows();
       renderOperatorHistoryTable();
-      showNotification('Profile and PIN updated and saved to Cloud!', 'success');
+      showNotification('Profile settings and PIN saved and synced successfully!', 'success');
     }
 
     function saveAdminPinSettings(event) {
@@ -5096,8 +5132,8 @@ if (!input) return;
         text = text.replace(new RegExp(`\\b${brand}\\b`, 'gi'), ' ');
       });
 
-      text = text.replace(/(?:SAR|SR|AED|RS|\$|USD|EUR)\.?\s*\d+(?:\.\d{1,2})?/gi, ' ');
-      text = text.replace(/\b\d+(?:\.\d{1,2})?\s*(?:SAR|SR|AED|RS|\$|USD|EUR)\b/gi, ' ');
+      text = text.replace(/(?:SAR|SR|AED|RS|\$)?\s*\d+(?:\.\d{1,2})?/gi, ' ');
+      text = text.replace(/\b\d+(?:\.\d{1,2})?\s*(?:SAR|SR|AED|RS|\$)\b/gi, ' ');
       text = text.replace(/\b\d{1,2}\s*%\s*(?:VAT|TAX)?\b/gi, ' ');
       text = text.replace(/\b(?:VAT|TAX|INCLUSIVE|EXCL|WAS|NOW|SAVE)\b/gi, ' ');
       text = text.replace(/\b\d{8,14}\b/g, ' ');
@@ -5548,7 +5584,6 @@ if (!input) return;
 
       const tagRows = document.querySelectorAll('.tag-row');
       const tagSizesArr = [];
-      let totalCalculatedQty = 0;
 
       tagRows.forEach(row => {
         const select = row.querySelector('.tag-size-select');
@@ -5561,7 +5596,6 @@ if (!input) return;
         const multiplier = slVal ? (parseInt(slVal) || 1) : 1;
         const noteVal = noteInput.value.trim() || sizeName;
 
-        totalCalculatedQty += multiplier;
         tagSizesArr.push({
           size: sizeName,
           manualSl: slVal,
@@ -5570,8 +5604,12 @@ if (!input) return;
         });
       });
 
-      const explicitQtyInput = document.getElementById('inputQty').value;
-      const finalQty = (explicitQtyInput !== "" && parseInt(explicitQtyInput) > 0) ? parseInt(explicitQtyInput) : totalCalculatedQty;
+      const explicitQtyInput = document.getElementById('inputQty').value.trim();
+      let itemQtyVal = "";
+      if (explicitQtyInput !== "") {
+        const parsedQty = parseInt(explicitQtyInput, 10);
+        itemQtyVal = isNaN(parsedQty) ? "" : parsedQty;
+      }
 
       checkPriceEquality();
 
@@ -5595,7 +5633,7 @@ if (!input) return;
         offer_price: offerVal,
         arabicDesc: arabicVal,
         arabic_description: arabicVal,
-        qty: finalQty,
+        qty: itemQtyVal,
         category: categoryVal,
         image_url: productImgUrl,
         status: 'PENDING'
@@ -5614,7 +5652,7 @@ if (!input) return;
         barcode: scannedBarcode,
         searchCode: searchCode,
         description: stripArabicCharacters(descVal),
-        qty: finalQty,
+        qty: itemQtyVal,
         regular_price: regularVal,
         offer_price: offerVal,
         arabic_description: arabicVal,
@@ -5653,7 +5691,7 @@ if (!input) return;
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/60 transition border-b border-slate-200 dark:border-slate-800/40">
           <td class="py-2 px-3 text-cyan-700 dark:text-cyan-300 font-bold">${item.barcode}</td>
           <td class="py-2 px-3 text-slate-800 dark:text-slate-200">${item.description}</td>
-          <td class="py-2 px-3 text-center text-cyan-500 font-bold">${item.qty || 1}</td>
+          <td class="py-2 px-3 text-center text-cyan-500 font-bold">${item.qty !== "" && item.qty !== undefined && item.qty !== null ? item.qty : '-'}</td>
           <td class="py-2 px-3 text-right text-slate-500 dark:text-slate-400">${parseFloat(item.regular_price) > 0 ? '$' + parseFloat(item.regular_price).toFixed(2) : '-'}</td>
           <td class="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">$${parseFloat(item.offer_price).toFixed(2)}</td>
           <td class="py-2 px-3 text-amber-700 dark:text-amber-200">${item.arabic_description || '-'}</td>
@@ -5682,7 +5720,7 @@ if (!input) return;
       document.getElementById('editingQueueItemId').value = item.id;
       document.getElementById('barcodeInput').value = item.barcode;
       document.getElementById('inputDescription').value = item.description;
-      document.getElementById('inputQty').value = item.qty;
+      document.getElementById('inputQty').value = item.qty !== undefined && item.qty !== null ? item.qty : '';
       document.getElementById('regularPrice').value = item.regular_price > 0 ? item.regular_price : '';
       document.getElementById('inputOfferPrice').value = item.offer_price;
       document.getElementById('inputArabicDescription').value = item.arabic_description || '';
@@ -5817,16 +5855,18 @@ if (!input) return;
             newCatalogCount++;
           }
 
-          if (item.tagSizes && Array.isArray(item.tagSizes)) {
+          const rawColCQty = (item.qty !== undefined && item.qty !== null && item.qty !== "" && !isNaN(Number(item.qty))) ? Number(item.qty) : "";
+
+          if (item.tagSizes && Array.isArray(item.tagSizes) && item.tagSizes.length > 0) {
             item.tagSizes.forEach(ts => {
-              const count = ts.multiplier > 0 ? ts.multiplier : 1;
+              const count = (ts.multiplier && ts.multiplier > 0) ? ts.multiplier : 1;
               for (let i = 0; i < count; i++) {
                 unrolledItems.push({
                   id: item.id + '_' + ts.size + '_' + i,
                   barcode: item.barcode,
                   searchCode: item.searchCode || item.barcode,
                   description: item.description,
-                  qty: 1,
+                  qty: rawColCQty,
                   regular_price: item.regular_price,
                   offer_price: item.offer_price,
                   arabic_description: item.arabic_description,
@@ -5839,24 +5879,21 @@ if (!input) return;
               }
             });
           } else {
-            const count = (!isNaN(parseInt(item.qty)) && parseInt(item.qty) > 0) ? parseInt(item.qty) : 1;
-            for (let i = 0; i < count; i++) {
-              unrolledItems.push({
-                id: item.id + '_' + i,
-                barcode: item.barcode,
-                searchCode: item.searchCode || item.barcode,
-                description: item.description,
-                qty: 1,
-                regular_price: item.regular_price,
-                offer_price: item.offer_price,
-                arabic_description: item.arabic_description,
-                note: item.note || 'S',
-                category: item.category,
-                image_url: item.image_url || '',
-                operator: item.operator,
-                timestamp: item.timestamp
-              });
-            }
+            unrolledItems.push({
+              id: item.id + '_0',
+              barcode: item.barcode,
+              searchCode: item.searchCode || item.barcode,
+              description: item.description,
+              qty: rawColCQty,
+              regular_price: item.regular_price,
+              offer_price: item.offer_price,
+              arabic_description: item.arabic_description,
+              note: item.note || 'S',
+              category: item.category,
+              image_url: item.image_url || '',
+              operator: item.operator,
+              timestamp: item.timestamp
+            });
           }
         });
 
@@ -5901,7 +5938,7 @@ if (!input) return;
             offer_price: item.offer_price,
             arabicDesc: item.arabic_description,
             arabic_description: item.arabic_description,
-            qty: 1,
+            qty: item.qty,
             category: item.category,
             image_url: item.image_url || '',
             status: 'Awaiting Approval'
@@ -6011,7 +6048,7 @@ if (!input) return;
           </td>
           <td class="py-2 px-3 text-cyan-700 dark:text-cyan-300 font-bold">${item.barcode}</td>
           <td class="py-2 px-3 text-slate-800 dark:text-slate-200">${item.description}</td>
-          <td class="py-2 px-3 text-center text-slate-600 dark:text-slate-300">1</td>
+          <td class="py-2 px-3 text-center text-slate-600 dark:text-slate-300">${item.qty !== "" && item.qty !== undefined && item.qty !== null ? item.qty : '-'}</td>
           <td class="py-2 px-3 text-right text-slate-500 dark:text-slate-400">${parseFloat(item.regular_price) > 0 ? '$' + parseFloat(item.regular_price).toFixed(2) : '-'}</td>
           <td class="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">$${parseFloat(item.offer_price).toFixed(2)}</td>
           <td class="py-2 px-3 text-amber-700 dark:text-amber-200 text-right">${item.arabic_description || '-'}</td>
@@ -6038,7 +6075,7 @@ if (!input) return;
         batch.items.forEach(item => {
           const barcodeStr = String(item.barcode ?? '').trim();
           const descStr = String(item.description ?? '').trim();
-          const qtyVal = 1;
+          const qtyVal = (item.qty !== undefined && item.qty !== null && item.qty !== "" && !isNaN(Number(item.qty))) ? Number(item.qty) : "";
           const regVal = (parseFloat(item.regular_price) === 0 || isNaN(parseFloat(item.regular_price))) ? "" : parseFloat(item.regular_price);
           const offerVal = (parseFloat(item.offer_price) === 0 || isNaN(parseFloat(item.offer_price))) ? "" : parseFloat(item.offer_price);
           const arabicStr = String(item.arabic_description ?? '').trim();
@@ -6052,10 +6089,22 @@ if (!input) return;
         const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
         for (let r = 1; r < rows.length; r++) {
-          const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
-          if (worksheet[cellRef]) {
-            worksheet[cellRef].t = 's';
-            worksheet[cellRef].z = '@';
+          const cellRefBarcode = XLSX.utils.encode_cell({ r: r, c: 0 });
+          if (worksheet[cellRefBarcode]) {
+            worksheet[cellRefBarcode].t = 's';
+            worksheet[cellRefBarcode].z = '@';
+          }
+
+          const rawImgUrl = batch.items[r - 1]?.image_url ? String(batch.items[r - 1].image_url).trim() : '';
+          const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 8 });
+          if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+            worksheet[cellRefImage] = {
+              t: 's',
+              v: 'Image',
+              l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+            };
+          } else if (!rawImgUrl) {
+            worksheet[cellRefImage] = { t: 's', v: '' };
           }
         }
 
@@ -6092,7 +6141,7 @@ if (!input) return;
             rows.push([
               String(item.barcode ?? '').trim(),
               String(item.description ?? '').trim(),
-              1,
+              (item.qty !== undefined && item.qty !== null && item.qty !== "" && !isNaN(Number(item.qty))) ? Number(item.qty) : "",
               (parseFloat(item.regular_price) === 0 || isNaN(parseFloat(item.regular_price))) ? "" : parseFloat(item.regular_price),
               (parseFloat(item.offer_price) === 0 || isNaN(parseFloat(item.offer_price))) ? "" : parseFloat(item.offer_price),
               String(item.arabic_description ?? '').trim(),
@@ -6104,10 +6153,22 @@ if (!input) return;
 
           const worksheet = XLSX.utils.aoa_to_sheet(rows);
           for (let r = 1; r < rows.length; r++) {
-            const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
-            if (worksheet[cellRef]) {
-              worksheet[cellRef].t = 's';
-              worksheet[cellRef].z = '@';
+            const cellRefBarcode = XLSX.utils.encode_cell({ r: r, c: 0 });
+            if (worksheet[cellRefBarcode]) {
+              worksheet[cellRefBarcode].t = 's';
+              worksheet[cellRefBarcode].z = '@';
+            }
+
+            const rawImgUrl = grouped[sizeKey][r - 1]?.image_url ? String(grouped[sizeKey][r - 1].image_url).trim() : '';
+            const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 8 });
+            if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+              worksheet[cellRefImage] = {
+                t: 's',
+                v: 'Image',
+                l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+              };
+            } else if (!rawImgUrl) {
+              worksheet[cellRefImage] = { t: 's', v: '' };
             }
           }
 
@@ -6203,14 +6264,26 @@ if (!input) return;
         const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
         for (let r = 1; r < rows.length; r++) {
-          const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
-          if (worksheet[cellRef]) {
-            worksheet[cellRef].t = 's';
-            worksheet[cellRef].z = '@';
+          const cellRefBarcode = XLSX.utils.encode_cell({ r: r, c: 0 });
+          if (worksheet[cellRefBarcode]) {
+            worksheet[cellRefBarcode].t = 's';
+            worksheet[cellRefBarcode].z = '@';
+          }
+
+          const rawImgUrl = fileObj.items[r - 1]?.image_url ? String(fileObj.items[r - 1].image_url).trim() : '';
+          const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 5 });
+          if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+            worksheet[cellRefImage] = {
+              t: 's',
+              v: 'Image',
+              l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+            };
+          } else if (!rawImgUrl) {
+            worksheet[cellRefImage] = { t: 's', v: '' };
           }
         }
 
-        worksheet['!cols'] = [{ wch: 18 }, { wch: 35 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 35 }, { wch: 25 }];
+        worksheet['!cols'] = [{ wch: 18 }, { wch: 35 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 18 }, { wch: 25 }];
 
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Catalog");
@@ -6321,7 +6394,7 @@ if (!input) return;
                 offer_price: 0,
                 arabicDesc: item.arabic_description || '',
                 arabic_description: item.arabic_description || '',
-                qty: 1,
+                qty: "",
                 category: item.category || detectCategoryFromKeywords(item.description) || 'General',
                 image_url: item.image_url || '',
                 status: 'PENDING'
@@ -6444,7 +6517,7 @@ if (!input) return;
               offer_price: 0,
               arabicDesc: item.arabic_description || '',
               arabic_description: item.arabic_description || '',
-              qty: 1,
+              qty: "",
               category: item.category || detectCategoryFromKeywords(item.description) || 'General',
               image_url: item.image_url || '',
               status: 'PENDING'
@@ -6595,7 +6668,6 @@ if (!input) return;
       if (!tbody) return;
 
       tbody.addEventListener('click', (e) => {
-        // If clicked on input, select, button, a, or textarea, ignore row toggle
         if (e.target.closest('input, select, button, a, textarea, label')) return;
 
         const row = e.target.closest('tr.pending-row-clickable');
@@ -6725,18 +6797,15 @@ if (!input) return;
         }
       });
 
-      // High-speed in-memory filter
       STATE.catalogOverrides = updatedOverrides;
       STATE.pendingApprovals = STATE.pendingApprovals.filter(item => !selectedIds.has(String(item.id)));
 
       SafeStorage.setJSON('TAGOPS_CATALOG_OVERRIDES', STATE.catalogOverrides);
       SafeStorage.setJSON('pendingApprovalsDeck', STATE.pendingApprovals);
 
-      // Single UI render
       renderPendingApprovalsDeck();
       updateMetrics();
 
-      // Parallel batch sync to Firebase
       if (window.batchRemovePendingApprovalsFromFirebase) {
         window.batchRemovePendingApprovalsFromFirebase(idsToRemove).catch(e => console.warn(e));
       }
@@ -6760,15 +6829,12 @@ if (!input) return;
       const selectedIds = new Set(checkedBoxes.map(b => b.getAttribute('data-id')));
       const idsToDelete = Array.from(selectedIds);
 
-      // High-speed in-memory bulk deletion
       STATE.pendingApprovals = STATE.pendingApprovals.filter(item => !selectedIds.has(String(item.id)));
       SafeStorage.setJSON('pendingApprovalsDeck', STATE.pendingApprovals);
 
-      // Single UI render
       renderPendingApprovalsDeck();
       updateMetrics();
 
-      // Parallel batch delete from Firebase
       if (window.batchRemovePendingApprovalsFromFirebase) {
         window.batchRemovePendingApprovalsFromFirebase(idsToDelete).catch(e => console.warn(e));
       }
@@ -6823,18 +6889,15 @@ if (!input) return;
         }
       });
 
-      // High-speed in-memory bulk operation
       STATE.catalogOverrides = updatedOverrides;
       STATE.pendingApprovals = [];
 
       SafeStorage.setJSON('TAGOPS_CATALOG_OVERRIDES', STATE.catalogOverrides);
       SafeStorage.setJSON('pendingApprovalsDeck', STATE.pendingApprovals);
 
-      // Single UI render
       renderPendingApprovalsDeck();
       updateMetrics();
 
-      // Parallel batch sync to Firebase
       if (window.batchRemovePendingApprovalsFromFirebase) {
         window.batchRemovePendingApprovalsFromFirebase(idsToRemove).catch(e => console.warn(e));
       }
@@ -6857,13 +6920,14 @@ if (!input) return;
         const updateItems = STATE.pendingApprovals.filter(i => i.Type !== 'NEW_ITEM' && i.type !== 'NEW_ITEM');
 
         const formatSheetData = (arr) => {
-          const headers = ['Operator', 'Barcode', 'Description', 'Regular Price', 'Arabic Description', 'Image URL', 'Timestamp'];
+          const headers = ['Operator', 'Barcode', 'Description', 'Qty', 'Regular Price', 'Arabic Description', 'Image URL', 'Timestamp'];
           const rows = [headers];
           arr.forEach(item => {
             rows.push([
               String(item.Operator_Name ?? '').trim(),
               String(item.barcode ?? '').trim(),
               String(item.description ?? '').trim(),
+              (item.qty !== undefined && item.qty !== null && item.qty !== "" && !isNaN(Number(item.qty))) ? Number(item.qty) : "",
               (parseFloat(item.regular_price) === 0 || isNaN(parseFloat(item.regular_price))) ? "" : parseFloat(item.regular_price),
               String(item.arabic_description ?? '').trim(),
               String(item.image_url ?? '').trim(),
@@ -6884,7 +6948,20 @@ if (!input) return;
               wsNew[cellRef].t = 's';
               wsNew[cellRef].z = '@';
             }
+
+            const rawImgUrl = newItems[r - 1]?.image_url ? String(newItems[r - 1].image_url).trim() : '';
+            const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 6 });
+            if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+              wsNew[cellRefImage] = {
+                t: 's',
+                v: 'Image',
+                l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+              };
+            } else if (!rawImgUrl) {
+              wsNew[cellRefImage] = { t: 's', v: '' };
+            }
           }
+          wsNew['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 35 }, { wch: 10 }, { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 22 }];
           XLSX.utils.book_append_sheet(workbook, wsNew, "New Items");
         }
 
@@ -6897,12 +6974,25 @@ if (!input) return;
               wsUpd[cellRef].t = 's';
               wsUpd[cellRef].z = '@';
             }
+
+            const rawImgUrl = updateItems[r - 1]?.image_url ? String(updateItems[r - 1].image_url).trim() : '';
+            const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 6 });
+            if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+              wsUpd[cellRefImage] = {
+                t: 's',
+                v: 'Image',
+                l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+              };
+            } else if (!rawImgUrl) {
+              wsUpd[cellRefImage] = { t: 's', v: '' };
+            }
           }
+          wsUpd['!cols'] = [{ wch: 18 }, { wch: 18 }, { wch: 35 }, { wch: 10 }, { wch: 15 }, { wch: 30 }, { wch: 18 }, { wch: 22 }];
           XLSX.utils.book_append_sheet(workbook, wsUpd, "Updated Items");
         }
 
         XLSX.writeFile(workbook, `Pending_Approvals_${Date.now()}.xlsx`);
-        showNotification('Downloaded Pending Excel with "New Items" tab!', 'success');
+        showNotification('Downloaded Pending Excel with clickable Image hyperlinks!', 'success');
       } catch (err) {
         showNotification('Pending Excel Export Error: ' + err.message, 'error');
       }
@@ -6941,10 +7031,6 @@ if (!input) return;
         clearTimeout(timer);
       }
     }
-
-    /* =========================================================================
-       UPGRADED ANNOUNCEMENTS MANAGER (PART 1 & PART 2 UPGRADES)
-       ========================================================================= */
 
     function setupClipboardImagePasteListener() {
       window.addEventListener('paste', (e) => {
@@ -7162,11 +7248,11 @@ if (!input) return;
       }
 
       const allCb = document.getElementById('announcementTargetAll');
-      const isAll = ann.targets?.includes('ALL');
+      const isAll = Boolean(ann.targets && ann.targets.includes('ALL'));
       if (allCb) allCb.checked = isAll;
 
       document.querySelectorAll('.individual-op-target').forEach(cb => {
-        cb.checked = !isAll && ann.targets?.includes(cb.value);
+        cb.checked = !isAll && Boolean(ann.targets && ann.targets.includes(cb.value));
       });
 
       showNotification(`Editing announcement: ${ann.title}`, 'info');
@@ -7233,23 +7319,13 @@ if (!input) return;
     function handleTargetAllCheckboxChange(masterCheckbox) {
       if (masterCheckbox.checked) {
         document.querySelectorAll('.individual-op-target').forEach(cb => cb.checked = false);
-      } else {
-        const anyChecked = Array.from(document.querySelectorAll('.individual-op-target')).some(cb => cb.checked);
-        if (!anyChecked) {
-          masterCheckbox.checked = true;
-        }
       }
     }
 
     function handleIndividualTargetCheckboxChange(indivCheckbox) {
       const allCb = document.getElementById('announcementTargetAll');
-      if (indivCheckbox.checked) {
-        if (allCb) allCb.checked = false;
-      } else {
-        const anyChecked = Array.from(document.querySelectorAll('.individual-op-target')).some(cb => cb.checked);
-        if (!anyChecked && allCb) {
-          allCb.checked = true;
-        }
+      if (indivCheckbox.checked && allCb) {
+        allCb.checked = false;
       }
     }
 
@@ -7436,9 +7512,11 @@ if (!input) return;
       }
 
       const isAllChecked = document.getElementById('announcementTargetAll')?.checked;
-      let targets = ["ALL"];
+      let targets = [];
 
-      if (!isAllChecked) {
+      if (isAllChecked) {
+        targets = ["ALL"];
+      } else {
         const checkedIndividuals = Array.from(document.querySelectorAll('.individual-op-target:checked')).map(b => b.value);
         targets = checkedIndividuals.length > 0 ? checkedIndividuals : ["ALL"];
       }
@@ -7496,9 +7574,16 @@ if (!input) return;
       const matchedAnnouncements = STATE.announcements.filter(ann => {
         if (ann.status && ann.status !== 'PUBLISHED') return false;
 
-        const roleMatches = !ann.targetRole || ann.targetRole === 'ALL' || ann.targetRole === currentRole;
-        const indivMatches = ann.targets?.includes('ALL') || ann.targets?.includes(STATE.operatorName);
-        if (!roleMatches && !indivMatches) return false;
+        const isTargetingAll = !ann.targets || ann.targets.length === 0 || ann.targets.includes('ALL');
+        if (isTargetingAll) {
+          if (ann.targetRole && ann.targetRole !== 'ALL' && ann.targetRole !== currentRole) {
+            return false;
+          }
+        } else {
+          if (!ann.targets.includes(STATE.operatorName)) {
+            return false;
+          }
+        }
 
         if (ann.startDate && nowIso < new Date(ann.startDate).toISOString()) return false;
         if (ann.expiryDate && nowIso > new Date(ann.expiryDate).toISOString()) return false;
@@ -7575,9 +7660,8 @@ if (!input) return;
       STATE.currentActiveAnnouncement = nextAnn;
 
       const opName = STATE.operatorName || 'Valued Operator';
-      const opPhoto = STATE.activeUserObj?.photo || localStorage.getItem(`TAGOPS_AVATAR_${opName}`) || '';
+      const opPhoto = STATE.activeUserObj?.photo || (STATE.role === 'ADMIN' ? STATE.adminProfile.photo : '');
 
-      // DYNAMIC CLIENT-SIDE PERSONALIZATION REPLACEMENTS
       let titleParsed = (nextAnn.title || '').replace(/\{NAME\}/gi, opName);
       
       let inlinePhotoHtml = opPhoto
@@ -7588,11 +7672,9 @@ if (!input) return;
         .replace(/\{NAME\}/gi, `<strong class="text-cyan-700 font-bold">${opName}</strong>`)
         .replace(/\{PHOTO\}/gi, inlinePhotoHtml);
 
-      // Icon update
       const badgeIcon = document.getElementById('announcementModalBadgeIcon');
       if (badgeIcon) badgeIcon.className = `${nextAnn.icon || 'fa-solid fa-bullhorn'} text-white text-xl`;
 
-      // Recipient Header Badge
       const recipientHeader = document.getElementById('announcementRecipientHeader');
       const recipientName = document.getElementById('announcementRecipientName');
       const recipientAvatar = document.getElementById('announcementRecipientAvatar');
@@ -7613,7 +7695,6 @@ if (!input) return;
         if (recipientHeader) recipientHeader.classList.add('hidden');
       }
 
-      // Title & 3D Typography
       const titleEl = document.getElementById('announcementModalTitle');
       titleEl.innerText = titleParsed;
       titleEl.style.fontFamily = nextAnn.fontFamily || 'inherit';
@@ -7628,7 +7709,6 @@ if (!input) return;
         titleEl.classList.remove('tracking-wide');
       }
 
-      // Banner Image & Optional Poster Overlay
       const imgEl = document.getElementById('announcementModalImg');
       const imgCont = document.getElementById('announcementImageContainer');
       const posterNameOverlay = document.getElementById('announcementPosterNameOverlay');
@@ -7647,11 +7727,9 @@ if (!input) return;
         imgCont.classList.add('hidden');
       }
 
-      // Rich HTML Body Content
       const bodyEl = document.getElementById('announcementModalBody');
       bodyEl.innerHTML = bodyParsed;
 
-      // Mandatory Read Checkbox Logic
       const btnDismissTop = document.getElementById('btnDismissAnnouncementTop');
       const btnActionMainText = document.getElementById('btnAnnouncementActionMainText');
       
@@ -7663,10 +7741,8 @@ if (!input) return;
         if (btnActionMainText) btnActionMainText.innerText = 'Acknowledge & Proceed';
       }
 
-      // Live Expiry Timer
       startAnnouncementExpiryCountdown(nextAnn.expiryDate);
 
-      // Play Chime Alert if enabled
       if (nextAnn.audioChime !== false) {
         playAnnouncementUrgentChime();
       }
@@ -7678,7 +7754,6 @@ if (!input) return;
       if (STATE.currentActiveAnnouncement) {
         const ann = STATE.currentActiveAnnouncement;
         
-        // Log Read Receipt to Firebase Cloud
         const receiptPayload = {
           announcementId: ann.id,
           operatorName: STATE.operatorName || 'Operator',
@@ -7715,7 +7790,6 @@ if (!input) return;
       showNextQueuedAnnouncement();
     }
 
-    // FUNCTIONAL POSTER PNG DOWNLOAD VIA HTML2CANVAS
     async function downloadNoticePoster() {
       const cardEl = document.getElementById('announcementPopupCard');
       if (!cardEl || !window.html2canvas) {
@@ -7824,19 +7898,31 @@ if (!input) return;
         const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
         for (let r = 1; r < rows.length; r++) {
-          const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
-          if (worksheet[cellRef]) {
-            worksheet[cellRef].t = 's';
-            worksheet[cellRef].z = '@';
+          const cellRefBarcode = XLSX.utils.encode_cell({ r: r, c: 0 });
+          if (worksheet[cellRefBarcode]) {
+            worksheet[cellRefBarcode].t = 's';
+            worksheet[cellRefBarcode].z = '@';
+          }
+
+          const rawImgUrl = STATE.masterCatalog[r - 1]?.image_url ? String(STATE.masterCatalog[r - 1].image_url).trim() : '';
+          const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 5 });
+          if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+            worksheet[cellRefImage] = {
+              t: 's',
+              v: 'Image',
+              l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+            };
+          } else if (!rawImgUrl) {
+            worksheet[cellRefImage] = { t: 's', v: '' };
           }
         }
 
-        worksheet['!cols'] = [{ wch: 18 }, { wch: 35 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 35 }, { wch: 25 }];
+        worksheet['!cols'] = [{ wch: 18 }, { wch: 35 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 18 }, { wch: 25 }];
 
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Master Catalog");
         XLSX.writeFile(workbook, `Master_Consolidated_Catalog_${Date.now()}.xlsx`);
-        showNotification('Exported Consolidated Catalog (.xlsx) with fixed column alignment!', 'success');
+        showNotification('Exported Consolidated Catalog (.xlsx) with clean Image hyperlinks!', 'success');
       } catch (err) {
         showNotification('Master Catalog Export Error: ' + err.message, 'error');
       }
@@ -7859,7 +7945,7 @@ if (!input) return;
           rows.push([
             String(i.barcode ?? '').trim(),
             String(i.description ?? '').trim(),
-            1,
+            (i.qty !== undefined && i.qty !== null && i.qty !== "" && !isNaN(Number(i.qty))) ? Number(i.qty) : "",
             (parseFloat(i.regular_price) === 0 || isNaN(parseFloat(i.regular_price))) ? "" : parseFloat(i.regular_price),
             (parseFloat(i.offer_price) === 0 || isNaN(parseFloat(i.offer_price))) ? "" : parseFloat(i.offer_price),
             String(i.arabic_description ?? '').trim(),
@@ -7871,10 +7957,22 @@ if (!input) return;
 
         const worksheet = XLSX.utils.aoa_to_sheet(rows);
         for (let r = 1; r < rows.length; r++) {
-          const cellRef = XLSX.utils.encode_cell({ r: r, c: 0 });
-          if (worksheet[cellRef]) {
-            worksheet[cellRef].t = 's';
-            worksheet[cellRef].z = '@';
+          const cellRefBarcode = XLSX.utils.encode_cell({ r: r, c: 0 });
+          if (worksheet[cellRefBarcode]) {
+            worksheet[cellRefBarcode].t = 's';
+            worksheet[cellRefBarcode].z = '@';
+          }
+
+          const rawImgUrl = log.items[r - 1]?.image_url ? String(log.items[r - 1].image_url).trim() : '';
+          const cellRefImage = XLSX.utils.encode_cell({ r: r, c: 8 });
+          if (rawImgUrl && (rawImgUrl.startsWith('http://') || rawImgUrl.startsWith('https://'))) {
+            worksheet[cellRefImage] = {
+              t: 's',
+              v: 'Image',
+              l: { Target: rawImgUrl, Tooltip: 'Click to view product image' }
+            };
+          } else if (!rawImgUrl) {
+            worksheet[cellRefImage] = { t: 's', v: '' };
           }
         }
 
@@ -7882,7 +7980,7 @@ if (!input) return;
         XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Backup");
         const safeBatchName = sanitizeOSFilename(batchName);
         XLSX.writeFile(workbook, `${safeBatchName}_Backup.xlsx`);
-        showNotification(`Downloaded Backup for ${batchName}`, 'success');
+        showNotification(`Downloaded Backup for ${batchName} with Image hyperlinks!`, 'success');
       } catch (err) {
         showNotification('Backup Download Error: ' + err.message, 'error');
       }
@@ -7945,7 +8043,7 @@ if (!input) return;
                   offer_price: item.offer_price,
                   arabicDesc: item.arabic_description,
                   arabic_description: item.arabic_description,
-                  qty: 1,
+                  qty: item.qty,
                   category: item.category,
                   image_url: item.image_url || '',
                   status: 'PENDING'
@@ -8350,5 +8448,5 @@ if (!input) return;
       }, 3500);
     }
   </script>
-</bodya>
+</body>
 </html>
